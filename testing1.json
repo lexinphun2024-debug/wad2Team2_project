@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "name": "Maxwell Food Centre",
+    "location": "1 Kadayanallur Street, Singapore 069184"
+  },
+  {
+    "id": 2,
+    "name": "Lau Pa Sat",
+    "location": "18 Raffles Quay, Singapore 048582"
+  },
+  {
+    "id": 3,
+    "name": "Chinatown Complex Food Centre",
+    "location": "335 Smith Street, Singapore 050335"
+  },
+  {
+    "id": 4,
+    "name": "Tiong Bahru Market Hawker Centre",
+    "location": "30 Seng Poh Road, Singapore 168898"
+  },
+  {
+    "id": 5,
+    "name": "Old Airport Road Food Centre",
+    "location": "51 Old Airport Road, Singapore 390051"
+  },
+  {
+    "id": 6,
+    "name": "Amoy Street Food Centre",
+    "location": "7 Maxwell Road, Singapore 069111"
+  },
+  {
+    "id": 7,
+    "name": "Newton Food Centre",
+    "location": "500 Clemenceau Avenue North, Singapore 229495"
+  },
+  {
+    "id": 8,
+    "name": "Tekka Centre",
+    "location": "665 Buffalo Road, Singapore 210665"
+  }
+
+]

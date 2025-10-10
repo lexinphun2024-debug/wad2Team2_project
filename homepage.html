@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="homepage.css" >
+
+      <!-- Add Axios Library-->
+     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+
+<body class="d-flex flex-column min-vh-100">
+    <!--allow to push the footer to the button, min-vh-100 is more on body fill the full viewscreen-->
+
+     <!--NavBar-->
+     <header>
+       <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">EasyEat</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav m-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">FindLocator</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Carts</a>
+                    </li>
+                </ul>
+
+                <!--Search Bar for normal search-->
+                
+                <form class="d-flex">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+        </nav>
+
+     </header>
+
+
+    <!--Image Display with header-->
+
+    <div id="hawkerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+
+        <!--Slidebar-->
+         <div class="carousel-indicators">
+            <button data-bs-target="#hawkerCarousel" data-bs-slide-to="0" class="active"></button>
+            <button data-bs-target="#hawkerCarousel" data-bs-slide-to="1"></button>
+            <button data-bs-target="#hawkerCarousel" data-bs-slide-to="2"></button>
+         </div>
+        
+        
+        <div class="carousel-inner">
+
+            <!--First-->
+            <div class="carousel-item active">
+                <div class="carousel-image-wrapper">
+                    <img src="images/hawkerimg1.jpg" class="d-block w-100" alt="hawkerimg1">
+                    <div class="overlay"></div>
+                </div>
+            </div>
+
+            <!--Fixed caption on top of carousel-->
+            <div class="carousel-caption">
+                <div class="caption-box">
+                    <h2 class="fw-bold text-light">Hawker Centre Hub</h2>
+                <p class="text-light">
+                    One-stop Platform that allow you to find queue, seats, stall and nearest location
+                    all in one place
+                </p>
+
+
+                </div>
+                
+            </div>
+
+            <!--Second-->
+            <div class="carousel-item">
+                <div class="carousel-image-wrapper">
+                    <img src="images/hawkerimg2.jpg" class="d-block w-100" alt="hawkerimg2">
+                    <div class="overlay"></div>
+                </div>
+            </div>
+
+            <!--Third-->
+            <div class="carousel-item">
+                 <div class="carousel-image-wrapper">
+                    <img src="images/hawkerimg3.jpg" class="d-block w-100" alt="hawkerimg3">
+                    <div class="overlay"></div>
+                </div>
+            </div>
+
+        </div>
+
+        
+
+    </div>
+
+
+    <!--Search Bar based on userinput hawker centre(keyup) -->
+    <!--link to stallinfo.html-->
+    <!--have a option beside seat availability-->
+    <div id="searchhawker" class="container text-center mt-3">
+        <p class="fw-bold">Type a Hawker Centre to search:</p>
+        <form>
+            <input type="text" id="hawkername">
+            <button id="searchbutton" class="btn btn-outline-success my-2" type="submit">Search</button>
+
+        </form>
+        <ul id="suggesthawkername"></ul>
+
+
+        <!--hidden link-->
+        <a id="displaystallinfo" href="stallinfo.html" style="display: none;"></a>
+    </div>
+
+   
+
+
+
+    <!--Footer-->
+    <footer class="py-3 mt-auto" style="background-color: bisque">
+        <div class="container">
+             <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <p>Making your hawker center experience better and quick access</p>
+                 </div>
+             </div>
+        </div>
+
+       
+    </div>
+
+    </footer>
+    
+
+    <!--json script-->
+    <script src="searchbar.js"></script>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+    
+</body>

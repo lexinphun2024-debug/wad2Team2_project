@@ -1,7 +1,7 @@
 .navbar-brand{
     font-size: 30px;
     color:palevioletred;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 .navbar-brand:hover{
@@ -12,31 +12,71 @@
     text-transform: uppercase;
     margin-right: 10px;
     margin-left: 10px;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 .carousel-image-wrapper{
     position: relative;
 }
 .carousel-image-wrapper img{
-    height: 400px;
-    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
     width: 100%;
-    filter:brightness(70%);
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 1;;
 }
 
 .carousel-caption{
-    top:15%;
-    bottom:auto;
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    bottom: auto;
+    width: 100%;
+    text-align: center;
+    z-index: 2;
 }
 
-footer p{
+.carousel-caption .caption-box {
+    background-color: rgba(0, 0, 0, 0.5); 
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 80%; 
+}
+
+.carousel-caption h2,
+.carousel-caption p {
+    color: #fff;
+    text-align: center;
+}
+
+footer p {
     font-size: 20px;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: bold;
+    margin: 0;
+    text-align: center; /* center text, can change to left if desired */
 }
 
-#suggesthawkername{
+/* ===== Search suggestions list ===== */
+#suggesthawkername {
     list-style: none;
-    padding-left:0;
+    padding-left: 0;
+}
+
+/* ===== Search input & button ===== */
+#searchhawker p {
+    text-align: left;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#hawkername {
+    width: 300px; /* adjust input width */
+}
+
+#searchbutton {
+    white-space: nowrap;
 }

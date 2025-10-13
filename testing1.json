@@ -1,43 +1,158 @@
 [
   {
-    "id": 1,
-    "name": "Maxwell Food Centre",
-    "location": "1 Kadayanallur Street, Singapore 069184"
+    "hawker": "Maxwell Food Centre",
+    "stalls": [
+      {
+        "name": "Tian Tian Hainanese Chicken Rice",
+        "menu": [
+          {"item": "Chicken Rice", "price": 5},
+          {"item": "Roast Chicken Rice", "price": 6},
+          {"item": "Drinks", "price": 2}
+        ]
+      },
+      {
+        "name": "Zhen Zhen Porridge",
+        "menu": [
+          {"item": "Fish Porridge", "price": 4},
+          {"item": "Chicken Porridge", "price": 4},
+          {"item": "Century Egg Porridge", "price": 5}
+        ]
+      }
+    ]
   },
   {
-    "id": 2,
-    "name": "Lau Pa Sat",
-    "location": "18 Raffles Quay, Singapore 048582"
+    "hawker": "Lau Pa Sat",
+    "stalls": [
+      {
+        "name": "Satay Street",
+        "menu": [
+          {"item": "Beef Satay (10 sticks)", "price": 12},
+          {"item": "Chicken Satay (10 sticks)", "price": 10}
+        ]
+      },
+      {
+        "name": "Fried Hokkien Mee",
+        "menu": [
+          {"item": "Small Hokkien Mee", "price": 5},
+          {"item": "Large Hokkien Mee", "price": 7}
+        ]
+      }
+    ]
   },
   {
-    "id": 3,
-    "name": "Chinatown Complex Food Centre",
-    "location": "335 Smith Street, Singapore 050335"
+    "hawker": "Chinatown Complex Food Centre",
+    "stalls": [
+      {
+        "name": "Liao Fan Hong Kong Soya Sauce Chicken Rice & Noodle",
+        "menu": [
+          {"item": "Chicken Rice", "price": 3},
+          {"item": "Roast Chicken Rice", "price": 4}
+        ]
+      },
+      {
+        "name": "Maxwell Fuzhou Fishball Noodle",
+        "menu": [
+          {"item": "Fishball Noodle", "price": 4},
+          {"item": "Fishcake Noodle", "price": 4}
+        ]
+      }
+    ]
   },
   {
-    "id": 4,
-    "name": "Tiong Bahru Market Hawker Centre",
-    "location": "30 Seng Poh Road, Singapore 168898"
+    "hawker": "Tiong Bahru Market Hawker Centre",
+    "stalls": [
+      {
+        "name": "Tiong Bahru Pau & Confectionery",
+        "menu": [
+          {"item": "Char Siew Pau", "price": 1.5},
+          {"item": "Lotus Paste Pau", "price": 1.5}
+        ]
+      },
+      {
+        "name": "Ah Tai Hainanese Chicken Rice",
+        "menu": [
+          {"item": "Chicken Rice", "price": 5},
+          {"item": "Drinks", "price": 2}
+        ]
+      }
+    ]
   },
   {
-    "id": 5,
-    "name": "Old Airport Road Food Centre",
-    "location": "51 Old Airport Road, Singapore 390051"
+    "hawker": "Old Airport Road Food Centre",
+    "stalls": [
+      {
+        "name": "Nam Sing Hokkien Fried Mee",
+        "menu": [
+          {"item": "Small Hokkien Mee", "price": 5},
+          {"item": "Large Hokkien Mee", "price": 7}
+        ]
+      },
+      {
+        "name": "Xin Mei Xiang Lor Mee",
+        "menu": [
+          {"item": "Lor Mee", "price": 4},
+          {"item": "Extra Egg", "price": 1}
+        ]
+      }
+    ]
   },
   {
-    "id": 6,
-    "name": "Amoy Street Food Centre",
-    "location": "7 Maxwell Road, Singapore 069111"
+    "hawker": "Amoy Street Food Centre",
+    "stalls": [
+      {
+        "name": "Amoy Street Beef Noodle",
+        "menu": [
+          {"item": "Beef Noodle Soup", "price": 6},
+          {"item": "Dry Beef Noodle", "price": 6}
+        ]
+      },
+      {
+        "name": "Amoy Street Fish Soup",
+        "menu": [
+          {"item": "Fish Soup", "price": 5},
+          {"item": "Drinks", "price": 2}
+        ]
+      }
+    ]
   },
   {
-    "id": 7,
-    "name": "Newton Food Centre",
-    "location": "500 Clemenceau Avenue North, Singapore 229495"
+    "hawker": "Newton Food Centre",
+    "stalls": [
+      {
+        "name": "Newton BBQ Seafood",
+        "menu": [
+          {"item": "Chilli Crab", "price": 25},
+          {"item": "Black Pepper Crab", "price": 25},
+          {"item": "Cereal Prawns", "price": 18}
+        ]
+      },
+      {
+        "name": "Chicken Wings & BBQ",
+        "menu": [
+          {"item": "BBQ Chicken Wings", "price": 5},
+          {"item": "Satay", "price": 10}
+        ]
+      }
+    ]
   },
   {
-    "id": 8,
-    "name": "Tekka Centre",
-    "location": "665 Buffalo Road, Singapore 210665"
+    "hawker": "Tekka Centre",
+    "stalls": [
+      {
+        "name": "Indian Roti Prata",
+        "menu": [
+          {"item": "Plain Roti Prata", "price": 1.5},
+          {"item": "Egg Prata", "price": 2}
+        ]
+      },
+      {
+        "name": "North Indian Thali",
+        "menu": [
+          {"item": "Vegetarian Thali", "price": 6},
+          {"item": "Chicken Thali", "price": 7}
+        ]
+      }
+    ]
   }
-
 ]
+

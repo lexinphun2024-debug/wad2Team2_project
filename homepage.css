@@ -1,8 +1,8 @@
 /* ===== Global Styles ===== */
 :root {
-  --primary: #ff7a5c;        /* coral/orange */
-  --secondary: #ffe6cc;      /* soft peach */
-  --accent: #f3c59b;         /* light orange accent */
+  --primary: #ff7a5c;      
+  --secondary: #ffe6cc;
+  --accent: #f3c59b;       
   --dark-text: #2b2b2b;
   --bg-gradient: linear-gradient(135deg, #fff9f4, #ffe7d6);
 }

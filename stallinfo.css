@@ -4,8 +4,33 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-footer p{
-    font-size: 20px;
-    font-family:Arial, Helvetica, sans-serif;
-    font-weight: bold;
+/* ===== Footer ===== */
+footer {
+  background-color: #fff1e1;
+  padding: 25px 0;
+  margin-top: 50px;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+footer p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0;
+}
+
+/*Hover pop up effect when stall card selected*/
+.card{
+  transition: all 0.3s ease;
+  /*make the movement smooth*/
+}
+
+.card:hover{
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0, 0.15);
+  /*add stronger shadow when hover to make it 'pop put' */
+  cursor: pointer;
+  background-color: #fdfdfd;
 }

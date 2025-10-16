@@ -1,4 +1,4 @@
-const url = "testing1.json";
+const url = "https://data.gov.sg/api/action/datastore_search?resource_id=d_68a42f09f350881996d83f9cd73ab02f";
 
 document.addEventListener('keyup',DisplayHawker);
 
@@ -26,11 +26,13 @@ function DisplayHawker(){
         
     axios.get(url)
     .then(response =>{
+        const hawkerlist = response.data.result.records;
 
-        const hawkerlist = response.data;
-        console.log(hawkerlist);
+        var count = 0;
         for(var i=0;i< hawkerlist.length;i++){
-           var hkname = hawkerlist[i].hawker;
+           var hkname = hawkerlist[i].name_of_centre;
+
+           //show the suggested hawker centre name if match
            if(hkname.toLowerCase().indexOf(lowercaseinput) !== -1){
                 var li = document.createElement('li');
                 li.textContent = hkname;
@@ -50,6 +52,11 @@ function DisplayHawker(){
 
                 suggest.appendChild(li);
                 //add the hawker centre in <li> to <ul>
+                count++;
+
+                if(count >= 5){
+                    break;
+                }
 
            }
         }

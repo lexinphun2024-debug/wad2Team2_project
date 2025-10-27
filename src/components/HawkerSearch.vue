@@ -79,7 +79,7 @@ export default {
         'Maxwell Food Centre',
         'Lau Pa Sat',
         'Old Airport Road',
-        'Chinatown Complex'
+        'Netwon Food Centre'
       ],
       url: "https://data.gov.sg/api/action/datastore_search?resource_id=d_68a42f09f350881996d83f9cd73ab02f"
     }

@@ -48,7 +48,7 @@
                 One-stop platform to find queues, seats, stalls, and nearest locations
               </p>
               
-              <!-- Search Bar -->
+              <!-- Search Bar for hawker centre name and bring to stall info-->
               <HawkerSearch @search="handleSearch" />
             </div>
           </div>
@@ -276,7 +276,7 @@ export default {
     }
   },
   methods: {
-    handleSearch(hawkerName) {
+    handleSearch(hawkerName) { //the input from hawker centre search (hawker name)
       this.$router.push({
         name: 'StallInfo',
         params: { hawkerName }

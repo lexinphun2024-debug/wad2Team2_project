@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '../views/HomePage.vue'
+import StallInfo from '../views/StallInfo.vue'
+import MenuInfo from '../views/Menuinfo.vue'
 
 const history = createWebHistory()
 const routes = [
@@ -16,7 +18,14 @@ const routes = [
   {
     path: '/stall-info/:hawkerName',
     name: 'StallInfo',
-    component: () => import('../views/StallInfo.vue'),
+    component:  StallInfo,
+    props: true
+  },
+
+  {
+    path: '/menu/:stallId',
+    name: 'MenuInfo',
+    component: MenuInfo,
     props: true
   }
 ]

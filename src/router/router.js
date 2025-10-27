@@ -8,17 +8,17 @@ const routes = [
     name: 'Home',
     component: HomePage
   },
-  {
-    path: '/find-locator',
-    name: 'FindLocator',
-    component: () => import('../views/FIndLocator.vue')
-  },
-  {
-    path: '/stall-info/:hawkerName',
-    name: 'StallInfo',
-    component: () => import('../views/StallInfo.vue'),
-    props: true
-  }
+  // {
+  //   path: '/find-locator',
+  //   name: 'FindLocator',
+  //   component: () => import('../views/FIndLocator.vue')
+  // },
+  // {
+  //   path: '/stall-info/:hawkerName',
+  //   name: 'StallInfo',
+  //   component: () => import('../views/StallInfo.vue'),
+  //   props: true
+  // }
 ]
 
 const router = createRouter({

@@ -84,13 +84,11 @@
           </div>
           
           <!-- Feature 2: Interactive Map -->
-          <div class="col-md-6">
-            <div class="feature-card h-100">
+           <div class="col-md-6">
+            <div class="feature-card h-100" @click="goToMap" style="cursor: pointer;">
               <div class="feature-icon">🗺️</div>
               <h3 class="feature-title">Interactive Map</h3>
-              <p class="feature-description">
-                Discover nearby hawker centres with our interactive map. Find directions, distance, and travel time instantly.
-              </p>
+              <p class="feature-description"> Discover nearby hawker centres with our interactive map. Find directions, distance, and travel time instantly.</p>
             </div>
           </div>
 
@@ -280,6 +278,11 @@ export default {
       this.$router.push({
         name: 'StallInfo',
         params: { hawkerName }
+      })
+    },
+    goToMap() {
+      this.$router.push({
+        name: 'FindLocator'
       })
     }
   }

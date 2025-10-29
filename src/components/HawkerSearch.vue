@@ -77,8 +77,8 @@ export default {
       isInputFocused: false,
       trendingHawkers: [
         'Maxwell Food Centre',
-        'Lau Pa Sat',
-        'Old Airport Road',
+        'Amoy Street Food Centre',
+        'Bedok Food Centre',
         'Netwon Food Centre'
       ],
       url: "https://data.gov.sg/api/action/datastore_search?resource_id=d_68a42f09f350881996d83f9cd73ab02f"
@@ -106,7 +106,7 @@ export default {
               filteredList.push(hkname)
               count++
               
-              if (count >= 5) break
+              if (count >= 3) break
             }
           }
           
@@ -176,6 +176,8 @@ export default {
 .search-wrapper-parent {
   position: relative;
   width: 100%;
+  overflow: visible;
+  z-index:1000;
 }
 
 .search-wrapper {

@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header :class="['navbar-wrapper', { 'scrolled': isScrolled }]">
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
         <router-link class="navbar-brand" to="/">
@@ -53,33 +53,74 @@
 </template>
 
 <script>
+import { getCartCount } from "@/services/supabaseService";
+
 export default {
   name: 'NavBar',
   data() {
     return {
-      cartCount: 3 // Replace with actual cart count from store/API
+      cartCount: 3,
+      isScrolled: false,
+      cartInterval: null
     }
   },
   methods: {
     handleLogin() {
-      // Navigate to login page or open login modal
       this.$router.push('/login')
+    },
+    handleScroll() {
+      this.isScrolled = window.scrollY > 20
+    },
+    async updateCartCount() {
+      try {
+        this.cartCount = await getCartCount(); 
+      } catch (error) {
+        console.error("Error updating cart count:", error);
+      }
+    },
+    goToCart() {
+      this.$router.push('/cart');
     }
+  },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+    this.updateCartCount(); // Load initial count
+    // Optional auto refresh every few seconds (for testing)
+    this.cartInterval = setInterval(this.updateCartCount, 1000);
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+    clearInterval(this.cartInterval);
   }
 }
 </script>
 
 <style scoped>
-.navbar {
-  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 1rem 0;
-  position: sticky;
+/* === Fixed Navbar Wrapper === */
+.navbar-wrapper {
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
   transition: all 0.3s ease;
 }
 
+/* Add subtle shadow + shrink when scrolled */
+.navbar-wrapper.scrolled {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+/* Navbar core */
+.navbar {
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  padding: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+/* Brand */
 .navbar-brand {
   font-weight: 700;
   font-size: 1.8rem;
@@ -111,6 +152,7 @@ export default {
   background-clip: text;
 }
 
+/* Links */
 .navbar-nav {
   gap: 1rem;
 }
@@ -153,11 +195,8 @@ export default {
   filter: brightness(0) invert(1);
 }
 
+/* Cart badge */
 .cart-link {
-  position: relative;
-}
-
-.cart-icon-wrapper {
   position: relative;
 }
 
@@ -184,6 +223,7 @@ export default {
   50% { transform: scale(1.1); }
 }
 
+/* Login button */
 .btn-login {
   display: flex;
   align-items: center;
@@ -202,24 +242,6 @@ export default {
   overflow: hidden;
 }
 
-.btn-login::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.btn-login:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
 .btn-login:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
@@ -229,42 +251,12 @@ export default {
   transform: translateY(0) scale(0.98);
 }
 
-.login-icon {
-  display: flex;
-  align-items: center;
-  transition: transform 0.3s ease;
-  position: relative;
-  z-index: 1;
-}
-
-.login-icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.btn-login:hover .login-icon {
-  transform: translateX(3px);
-  animation: slideIn 0.6s ease;
-}
-
-@keyframes slideIn {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
-}
-
-.login-text {
-  position: relative;
-  z-index: 1;
-  font-family: 'Poppins', sans-serif;
-}
-
 /* Mobile responsive */
 @media (max-width: 991px) {
   .navbar-nav {
     padding-top: 1rem;
     gap: 0.5rem;
   }
-  
   .btn-login {
     width: 100%;
     justify-content: center;

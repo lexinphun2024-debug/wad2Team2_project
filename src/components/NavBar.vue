@@ -59,7 +59,7 @@ export default {
   name: 'NavBar',
   data() {
     return {
-      cartCount: 3,
+      cartCount: 0,
       isScrolled: false,
       cartInterval: null
     }

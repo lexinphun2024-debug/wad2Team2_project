@@ -1,5 +1,6 @@
 <template>
   <!-- NavBar -->
+   
   <NavBar />
   <div class="menu-info-container">
     <!-- Header with gradient overlay -->
@@ -12,7 +13,7 @@
         </button>
         <div class="stall-info">
           <h2 class="stall-title">{{ stallName }}</h2>
-          <p class="stall-subtitle">Explore our delicious menu</p>
+          <p class="stall-subtitle">Explore delicious menu</p>
         </div>
       </div>
       <div class="header-decoration">
@@ -49,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Loading with better animation -->
+    <!-- Loading with animation for the preparing menu part -->
     <div v-if="loading" class="loading">
       <div class="loading-animation">
         <div class="loading-bowl"></div>
@@ -252,7 +253,7 @@ export default {
 
     getCategoryIcon(category) {
       const icons = {
-        'drinks': '🥤',
+        'beverage': '🥤',
         'main': '🍜',
         'sides': '🍟',
         'desserts': '🍰',
@@ -300,15 +301,17 @@ export default {
   box-sizing: border-box;
 }
 
+
 .menu-info-container {
   padding: 1rem;
   font-family: "Poppins", sans-serif;
   color: #333;
   background: linear-gradient(135deg, #fff8f0 0%, #ffe8d1 50%, #ffd9b3 100%);
   min-height: 100vh;
-  padding-top: 90px;
   position: relative;
   overflow-x: hidden;
+  padding-top: calc(var(--navbar-height, 70px) + 20px);
+  /*padding between header and navbar */
 }
 
 /* Enhanced Header */
@@ -482,6 +485,7 @@ export default {
   border-color: #ffe8d1;
 }
 
+/*the icon can shift upward abit when hover */
 .tab-btn:hover .tab-icon {
   transform: scale(1.2) rotate(10deg);
 }
@@ -523,7 +527,7 @@ export default {
   50% { opacity: 0.6; transform: translateX(-50%) scale(1.3); }
 }
 
-/* Enhanced Loading */
+/* Loading the menu part */
 .loading {
   display: flex;
   flex-direction: column;
@@ -696,7 +700,7 @@ export default {
   gap: 0.75rem;
 }
 
-/* Enhanced Add Button */
+/* Add to cart Button  */
 .add-btn {
   background: linear-gradient(135deg, #ff8c42 0%, #ffa94d 100%);
   color: white;
@@ -739,7 +743,7 @@ export default {
   transform: translateY(0);
 }
 
-/* Enhanced Quantity Controls */
+/* Quantity Button '+' '-' and quantity number */
 .quantity-controls {
   display: flex;
   align-items: center;
@@ -794,7 +798,6 @@ export default {
 
 .quantity-btn:hover svg {
   stroke: white;
-  transform: scale(1.2) rotate(90deg);
 }
 
 .quantity-btn:active {
@@ -879,9 +882,7 @@ export default {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .menu-info-container {
-    padding: 0.75rem;
-  }
+  
 
   .header {
     padding: 1.25rem;
@@ -932,7 +933,6 @@ export default {
   }
   
   .menu-info-container {
-    padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
   }
@@ -946,6 +946,6 @@ export default {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
+  } 
 }
 </style>

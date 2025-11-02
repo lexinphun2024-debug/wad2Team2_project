@@ -43,7 +43,7 @@
         </h2>
       </div>
       
-      <!-- Loading State -->
+      <!-- Loading cart Part -->
       <div v-if="loading" class="loading-state">
         <div class="spinner"></div>
         <p>Loading your cart...</p>
@@ -86,7 +86,7 @@
         
         </div>
 
-        <!-- Group items by stall -->
+        <!-- Group items by stall name -->
         <div v-for="(items, stallName) in groupedByStall" :key="stallName" class="stall-group">
           <div class="stall-header">
             <label class="stall-checkbox">
@@ -171,7 +171,7 @@
             </div>
           </div>
           
-          <!--Each Stall Subtotal -->
+          <!--Each Stall Subtotal of all food item -->
           <div class="stall-subtotal">
             <span>{{ stallName }} Subtotal</span>
             <div class="subtotal-breakdown">
@@ -362,42 +362,6 @@ export default {
         .filter(item => this.selectedItems.has(item.id))
         .reduce((total, item) => total + (item.price * item.quantity), 0);
     },
-    
-    deleteSelectedItems() {
-      const count = this.selectedItems.size;
-      this.showConfirmModal(
-        'Delete Selected Items',
-        `Remove ${count} selected item${count !== 1 ? 's' : ''} from cart?`,
-        'Delete',
-        this.performDeleteSelected,
-        '🗑️'
-      );
-    },
-    
-    async performDeleteSelected() {
-      const itemsToDelete = Array.from(this.selectedItems);
-      
-      try {
-        for (const itemId of itemsToDelete) {
-          const item = this.cartItems.find(i => i.id === itemId);
-          if (item) {
-            this.removingItems.add(itemId);
-            await removeFromCart(item.item_id);
-          }
-        }
-        
-        setTimeout(() => {
-          this.cartItems = this.cartItems.filter(item => !itemsToDelete.includes(item.id));
-          this.selectedItems.clear();
-          itemsToDelete.forEach(id => this.removingItems.delete(id));
-          this.showToast(`${itemsToDelete.length} items removed from cart`, 'success');
-        }, 300);
-      } catch (error) {
-        console.error('Failed to delete items:', error);
-        this.showToast('Failed to remove some items', 'error');
-        itemsToDelete.forEach(id => this.removingItems.delete(id));
-      }
-    },
 
     // Toast notification system
     showToast(message, type = 'info') {
@@ -448,12 +412,12 @@ export default {
       this.closeModal();
     },
     
-    //load the cart item (Start with no items selected - subtotal = 0)
+    //load the cart item, that start with no item selected, subtotal = 0
     async loadCart() {
       this.loading = true;
       try {
         this.cartItems = await getAllCartItems();
-        // Start with nothing selected - user must choose what to pay for
+        // Start with nothing selected 
         this.selectedItems.clear();
       } catch (error) {
         console.error('Error loading cart:', error);
@@ -499,7 +463,7 @@ export default {
     },
 
 
-    //DELETE PART
+    //DELETE PART for each food item
     
     deleteItem(item) {
       this.showConfirmModal(
@@ -558,6 +522,7 @@ export default {
       }
     },
     
+    //handle payment 
     handlePay() {
       if (this.selectedItems.size === 0) {
         this.showToast('Please select items to proceed with payment', 'warning');
@@ -597,8 +562,8 @@ export default {
 
       const paymentAmount = this.selectedTotal;
 
-      console.log('Processing payment for items:', selectedItems);
-      console.log('Total amount:', paymentAmount);
+      //console.log('Processing payment for items:', selectedItems);
+      //console.log('Total amount:', paymentAmount);
 
       // Insert each item as a separate order row
       const orderPromises = selectedItems.map(item => {
@@ -618,7 +583,7 @@ export default {
           .single();
         });
 
-      // Wait for all orders to be created
+      // create the order first
       const results = await Promise.all(orderPromises);
     
       console.log('Orders created:', results);

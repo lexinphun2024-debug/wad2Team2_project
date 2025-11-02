@@ -3,6 +3,7 @@ import HomePage from '../views/HomePage.vue'
 import StallInfo from '../views/StallInfo.vue'
 import MenuInfo from '../views/Menuinfo.vue'
 import Cart from '../views/Cart.vue'
+import Login from '../views/Login.vue'
 
 const history = createWebHistory()
 const routes = [
@@ -33,7 +34,15 @@ const routes = [
     path: '/cart',
     name: 'Cart',
     component:  Cart
+  },
+
+  {
+    path:'/login',
+    name:'Login',
+    component: Login
   }
+
+
 ]
 
 const router = createRouter({

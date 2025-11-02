@@ -290,6 +290,7 @@ export default {
 </script>
 
 <style scoped>
+
 /* Hero Section - Bigger Height */
 .hero-section {
   position: relative;
@@ -297,6 +298,7 @@ export default {
   margin-bottom: 3rem;
   overflow:visible;
   /*allow dropdown to overflow*/
+   padding-top: 90px;
 }
 
 .carousel {

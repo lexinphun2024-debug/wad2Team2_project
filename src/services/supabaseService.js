@@ -5,6 +5,8 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+//HAWKER CENTRE SELECTED SHOW ALL STALL INFO
+
 // Fetch stalls by hawker centre name --> user select 'all'
 export const getStallsByHawkerName = async (hawkerCentreName) => {
   try {
@@ -75,7 +77,7 @@ export const getStallById = async (stallId) => {
   }
 }
 
-// ========== MENU ITEMS ==========
+// MENU ITEMS FOR A STALL THAT SELECTED
 
 // Fetch all menu items for a stall
 export const getMenuItemsByStall = async (stallId) => {
@@ -156,35 +158,26 @@ export const getCategoriesByStall = async (stallId) => {
   }
 }
 
-// Filter menu items by price range
-export const getMenuItemsByPriceRange = async (stallId, minPrice, maxPrice) => {
-  try {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('stall_id', stallId)
-      .gte('price', minPrice)
-      .lte('price', maxPrice)
-      .order('id', { ascending: true })
-    
-    if (error) throw error
-    return data || []
-  } catch (error) {
-    console.error('Error fetching menu items by price:', error)
-    return []
-  }
-}
 
+//CART SECTION
 
-//CART
+//ADD FOOD ITEM TO THE CART WITH THE STALLNAME AND STALLID
 export async function addToCart(stallId, stallName, itemId, itemName, price) {
   try {
+    //Get logged-in user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error("User not logged in");
+
+    const userId = user.id;
+
     // Check if item already exists in cart
     const { data: existing, error: fetchError } = await supabase
-      .from('cart_items')
-      .select('*')
-      .eq('item_id', itemId)
-      .maybeSingle(); //the cart is empty, it return null
+      .from("cart_items")
+      .select("*")
+      .eq("item_id", itemId)
+      .eq("user_id", userId)
+      .maybeSingle();
+      //the cart is empty, it return null, BUT STILL CAN DISPLAY OUT
 
   
     if (existing) {
@@ -203,6 +196,7 @@ export async function addToCart(stallId, stallName, itemId, itemName, price) {
       const { data, error } = await supabase
         .from('cart_items')
         .insert({
+          user_id: userId,
           stall_id: stallId,
           stall_name: stallName,
           item_id: itemId,
@@ -222,17 +216,21 @@ export async function addToCart(stallId, stallName, itemId, itemName, price) {
   }
 }
 
-// Update item quantity
+// Update the food item quantity in the cart, when user click on the '+' , '-'
 export async function updateCartItemQuantity(itemId, quantity) {
   try {
     if (quantity <= 0) {
       return await removeFromCart(itemId);
     }
 
+     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not logged in");
+
     const { data, error } = await supabase
       .from('cart_items')
       .update({ quantity })
       .eq('item_id', itemId)
+       .eq("user_id", user.id)
       .select()
       .maybeSingle();
 
@@ -244,13 +242,17 @@ export async function updateCartItemQuantity(itemId, quantity) {
   }
 }
 
-// Get item quantity in cart
+// Get food item quantity in the cart
 export async function getCartItemQuantity(itemId) {
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not logged in");
+
     const { data, error } = await supabase
       .from('cart_items')
       .select('quantity')
       .eq('item_id', itemId)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
@@ -261,13 +263,17 @@ export async function getCartItemQuantity(itemId) {
   }
 }
 
-// Remove item from cart
+// Remove food item from cart
 export async function removeFromCart(itemId) {
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not logged in");
+
     const { error } = await supabase
       .from('cart_items')
       .delete()
-      .eq('item_id', itemId);
+      .eq('item_id', itemId)
+       .eq("item_id", itemId);
 
     if (error) throw error;
   } catch (error) {
@@ -276,12 +282,17 @@ export async function removeFromCart(itemId) {
   }
 }
 
-// Get all cart items
+// Get all the food item in the cart
 export async function getAllCartItems() {
   try {
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from('cart_items')
-      .select('*');
+      .select('*')
+       .eq("user_id", user.id);
 
     if (error) {
       // Return empty array if there's any error (table doesn't exist, no data, etc.)
@@ -297,9 +308,13 @@ export async function getAllCartItems() {
 // Get total cart count (sum of all quantities)
 export async function getCartCount() {
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return 0;
+
     const { data, error } = await supabase
       .from('cart_items')
-      .select('quantity');
+      .select('quantity')
+       .eq("user_id", user.id);;
 
     if (error) {
       return 0;
@@ -319,14 +334,74 @@ export async function getCartCount() {
 // Clear entire cart
 export async function clearCart() {
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not logged in");
+
     const { error } = await supabase
       .from('cart_items')
       .delete()
-      .gt('id', 0); // Delete all rows where id > 0
+      .eq("user_id", user.id);
 
     if (error) throw error;
   } catch (error) {
     console.error('Error clearing cart:', error);
+    throw error;
+  }
+}
+
+
+//ORDER PART
+//get all order of that user
+export async function getUserOrders(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error getting user orders:', error);
+    return [];
+  }
+}
+
+// Add new order after user made successful payment
+export async function addOrder(userId, items, totalAmount) {
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .insert({
+        user_id: userId,
+        items: JSON.stringify(items), // store array of items
+        total_amount: totalAmount,
+        status: 'preparing',
+        created_at: new Date()
+      })
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error adding order:', error);
+    throw error;
+  }
+}
+
+// Update the order status
+export async function updateOrderStatus(orderId, status) {
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error updating order status:', error);
     throw error;
   }
 }

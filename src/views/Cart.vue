@@ -43,7 +43,7 @@
         </h2>
       </div>
       
-      <!-- Loading State -->
+      <!-- Loading cart Part -->
       <div v-if="loading" class="loading-state">
         <div class="spinner"></div>
         <p>Loading your cart...</p>
@@ -66,18 +66,68 @@
 
       <!-- Cart Items -->
       <div v-else class="cart-items">
-        <!-- Group items by stall -->
+        <!-- Select All Section -->
+        <div class="select-all-section">
+          <label class="select-all-checkbox">
+            <input 
+              type="checkbox" 
+              :checked="isAllSelected"
+              :indeterminate.prop="isSomeSelected"
+              @change="toggleSelectAll"
+            >
+            <span class="checkbox-custom"></span>
+            <span class="select-all-text">
+              {{ isAllSelected ? 'Deselect All' : 'Select All' }}
+              <span class="selected-count" v-if="selectedItems.size > 0">
+                ({{ selectedItems.size }} of {{ cartItems.length }} selected)
+              </span>
+            </span>
+          </label>
+        
+        </div>
+
+        <!-- Group items by stall name -->
         <div v-for="(items, stallName) in groupedByStall" :key="stallName" class="stall-group">
           <div class="stall-header">
-            <h3 class="stall-name">
-              {{ stallName }}
-            </h3>
-            <span class="stall-item-count">{{ items.length }} item{{ items.length !== 1 ? 's' : '' }}</span>
+            <label class="stall-checkbox">
+              <input 
+                type="checkbox" 
+                :checked="isStallSelected(items)"
+                :indeterminate.prop="isStallPartiallySelected(items)"
+                @change="toggleStallSelection(items)"
+              >
+              <span class="checkbox-custom-stall"></span>
+              <h3 class="stall-name">
+                {{ stallName }}
+              </h3>
+            </label>
+            <span class="stall-item-count">
+              {{ items.length }} item{{ items.length !== 1 ? 's' : '' }}
+              <span v-if="getStallSelectedCount(items) > 0" class="stall-selected-badge">
+                • {{ getStallSelectedCount(items) }} selected
+              </span>
+            </span>
           </div>
           
           <div class="items-list">
-            <div v-for="item in items" :key="item.id" class="cart-item" :class="{ 'removing': removingItems.has(item.id) }">
+            <div 
+              v-for="item in items" 
+              :key="item.id" 
+              :class="['cart-item', { 
+                'removing': removingItems.has(item.id),
+                'selected': selectedItems.has(item.id)
+              }]"
+            >
               <div class="item-main">
+                <label class="item-checkbox">
+                  <input 
+                    type="checkbox" 
+                    :checked="selectedItems.has(item.id)"
+                    @change="toggleItemSelection(item.id)"
+                  >
+                  <span class="checkbox-custom-item"></span>
+                </label>
+                
                 <div class="item-info">
                   <h4>{{ item.item_name }}</h4>
                   <p class="item-price">${{ item.price.toFixed(2) }} each</p>
@@ -121,28 +171,48 @@
             </div>
           </div>
           
-          <!-- Stall Subtotal -->
+          <!--Each Stall Subtotal of all food item -->
           <div class="stall-subtotal">
             <span>{{ stallName }} Subtotal</span>
-            <span class="subtotal-amount">${{ calculateStallTotal(items).toFixed(2) }}</span>
+            <div class="subtotal-breakdown">
+              <span class="subtotal-amount">
+                ${{ getStallSelectedTotal(items).toFixed(2) }}
+              </span>
+            </div>
           </div>
         </div>
-
-        <!-- Cart Summary -->
+         
+        <!-- Cart Summary for all food item that selected  -->
         <div class="cart-summary">
           <div class="summary-card">
             <h3>Order Summary</h3>
             
-            <div class="summary-row subtotal-row">
-              <span>Subtotal ({{ totalItems }} items)</span>
-              <span class="subtotal-value">${{ grandTotal.toFixed(2) }}</span>
+            <div class="summary-row info-row">
+              <span>
+                <span class="info-icon">📦</span>
+                Total Items in Cart
+              </span>
+              <span class="info-value">{{ totalItems }}</span>
+            </div>
+            
+            <div class="summary-row info-row">
+              <span>
+                <span class="info-icon">✓</span>
+                Selected Items
+              </span>
+              <span class="info-value selected-highlight">{{ selectedTotalItems }}</span>
             </div>
             
             <div class="summary-divider"></div>
             
+    
             <div class="total-row">
-              <span class="total-label">Total</span>
-              <span class="total-amount">${{ grandTotal.toFixed(2) }}</span>
+              <span class="total-label">Amount to Pay</span>
+              <div class="total-display">
+                <span class="total-amount" :class="{ 'zero-amount': selectedTotal === 0 }">
+                  ${{ selectedTotal.toFixed(2) }}
+                </span>
+              </div>
             </div>
           </div>
           
@@ -151,10 +221,22 @@
               <span class="btn-icon">🗑️</span>
               <span>Clear Cart</span>
             </button>
-            <button class="pay-btn" @click="handlePay">
+            <button 
+              class="pay-btn" 
+              @click="handlePay"
+              :disabled="selectedItems.size === 0"
+              :class="{ 'pay-btn-disabled': selectedItems.size === 0 }"
+            >
               <span class="btn-icon">💳</span>
-              <span>Proceed to Pay</span>
+              <span>
+                {{ selectedItems.size === 0 ? 'Select Items to Pay' : `Pay $${selectedTotal.toFixed(2)}` }}
+              </span>
             </button>
+          </div>
+          
+          <div v-if="selectedItems.size === 0" class="selection-hint">
+            <span class="hint-icon">👆</span>
+            <span>Select items above to proceed with payment</span>
           </div>
         </div>
       </div>
@@ -164,7 +246,8 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue';
-import { getAllCartItems, updateCartItemQuantity, removeFromCart, clearCart } from "@/services/supabaseService";
+import { supabase, getAllCartItems, updateCartItemQuantity, 
+  removeFromCart, clearCart, addOrder } from "@/services/supabaseService";
 
 export default {
   name: 'Cart',
@@ -176,11 +259,12 @@ export default {
       cartItems: [],
       loading: true,
       removingItems: new Set(),
+      selectedItems: new Set(),
       toasts: [],
       toastId: 0,
       showModal: false,
       modalData: {},
-      pendingAction: null
+      pendingAction: null,
     };
   },
   computed: {
@@ -199,14 +283,85 @@ export default {
         return total + (item.price * item.quantity);
       }, 0);
     },
+    selectedTotal() {
+      return this.cartItems
+        .filter(item => this.selectedItems.has(item.id))
+        .reduce((total, item) => total + (item.price * item.quantity), 0);
+    },
     totalItems() {
       return this.cartItems.reduce((total, item) => total + item.quantity, 0);
+    },
+    selectedTotalItems() {
+      return this.cartItems
+        .filter(item => this.selectedItems.has(item.id))
+        .reduce((total, item) => total + item.quantity, 0);
+    },
+    isAllSelected() {
+      return this.cartItems.length > 0 && this.selectedItems.size === this.cartItems.length;
+    },
+    isSomeSelected() {
+      return this.selectedItems.size > 0 && this.selectedItems.size < this.cartItems.length;
     }
   },
   async mounted() {
-    await this.loadCart();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await this.loadCart();
+    } else {
+      this.showToast('You must log in to view the cart', 'warning');
+      this.$router.push('/login');
+    }
   },
   methods: {
+    // Selection methods
+    toggleItemSelection(itemId) {
+      if (this.selectedItems.has(itemId)) {
+        this.selectedItems.delete(itemId);
+      } else {
+        this.selectedItems.add(itemId);
+      }
+      this.selectedItems = new Set(this.selectedItems);
+    },
+    
+    toggleSelectAll() {
+      if (this.isAllSelected) {
+        this.selectedItems.clear();
+      } else {
+        this.cartItems.forEach(item => this.selectedItems.add(item.id));
+      }
+      this.selectedItems = new Set(this.selectedItems);
+    },
+    
+    toggleStallSelection(items) {
+      const isSelected = this.isStallSelected(items);
+      items.forEach(item => {
+        if (isSelected) {
+          this.selectedItems.delete(item.id);
+        } else {
+          this.selectedItems.add(item.id);
+        }
+      });
+      this.selectedItems = new Set(this.selectedItems);
+    },
+    
+    isStallSelected(items) {
+      return items.every(item => this.selectedItems.has(item.id));
+    },
+    
+    isStallPartiallySelected(items) {
+      const selectedCount = items.filter(item => this.selectedItems.has(item.id)).length;
+      return selectedCount > 0 && selectedCount < items.length;
+    },
+    
+    getStallSelectedCount(items) {
+      return items.filter(item => this.selectedItems.has(item.id)).length;
+    },
+    
+    getStallSelectedTotal(items) {
+      return items
+        .filter(item => this.selectedItems.has(item.id))
+        .reduce((total, item) => total + (item.price * item.quantity), 0);
+    },
 
     // Toast notification system
     showToast(message, type = 'info') {
@@ -228,7 +383,7 @@ export default {
       
       setTimeout(() => {
         this.removeToast(toast.id);
-      }, 1000);
+      }, 3000);
     },
     
     removeToast(id) {
@@ -257,11 +412,13 @@ export default {
       this.closeModal();
     },
     
-    //load the cart item
+    //load the cart item, that start with no item selected, subtotal = 0
     async loadCart() {
       this.loading = true;
       try {
         this.cartItems = await getAllCartItems();
+        // Start with nothing selected 
+        this.selectedItems.clear();
       } catch (error) {
         console.error('Error loading cart:', error);
         this.showToast('Failed to load cart. Please refresh the page.', 'error');
@@ -304,6 +461,9 @@ export default {
         this.showToast('Failed to update quantity', 'error');
       }
     },
+
+
+    //DELETE PART for each food item
     
     deleteItem(item) {
       this.showConfirmModal(
@@ -323,6 +483,7 @@ export default {
         
         setTimeout(() => {
           this.cartItems = this.cartItems.filter(i => i.id !== item.id);
+          this.selectedItems.delete(item.id);
           this.removingItems.delete(item.id);
           this.showToast('Item removed from cart', 'success');
         }, 300);
@@ -353,6 +514,7 @@ export default {
       try {
         await clearCart();
         this.cartItems = [];
+        this.selectedItems.clear();
         this.showToast('Cart cleared successfully', 'success');
       } catch (error) {
         console.error('Failed to clear cart:', error);
@@ -360,15 +522,16 @@ export default {
       }
     },
     
+    //handle payment 
     handlePay() {
-      if (this.cartItems.length === 0) {
-        this.showToast('Cart is empty', 'warning');
+      if (this.selectedItems.size === 0) {
+        this.showToast('Please select items to proceed with payment', 'warning');
         return;
       }
       
       this.showConfirmModal(
         'Confirm Payment',
-        `Proceed with payment of $${this.grandTotal.toFixed(2)}?`,
+        `Proceed with payment of $${this.selectedTotal.toFixed(2)} for ${this.selectedItems.size} selected item${this.selectedItems.size !== 1 ? 's' : ''}?`,
         'Pay Now',
         this.performPayment,
         '💳'
@@ -377,17 +540,92 @@ export default {
     
     async performPayment() {
       try {
-        await clearCart();
-        this.cartItems = [];
-        this.showToast(`Payment of $${this.grandTotal.toFixed(2)} successful! Thank you for your order.`, 'success');
-        
-        setTimeout(() => {
-          this.$router.push('/');
-        }, 2000);
-      } catch (error) {
-        console.error('Payment failed:', error);
-        this.showToast('Payment processing failed. Please try again.', 'error');
+          // Check that user is logged in first
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) {
+            this.showToast('Please log in to complete your order.', 'error');
+            this.$router.push('/login');
+            return;
+          }
+
+        // Get only selected food item
+        const selectedItemIds = Array.from(this.selectedItems);
+        const selectedItems = this.cartItems.filter(item => 
+        selectedItemIds.includes(item.id)
+       );
+
+      // Validate that items are selected
+      if (selectedItems.length === 0) {
+        this.showToast('Please select items to purchase.', 'error');
+        return;
       }
+
+      const paymentAmount = this.selectedTotal;
+
+      //console.log('Processing payment for items:', selectedItems);
+      //console.log('Total amount:', paymentAmount);
+
+      // Insert each item as a separate order row
+      const orderPromises = selectedItems.map(item => {
+        return supabase
+          .from('orders')
+          .insert({
+            user_id: user.id,
+            item_id: item.item_id,
+            item_name: item.item_name,
+            stall_id: item.stall_id || null,
+            stall_name: item.stall_name,
+            quantity: item.quantity,
+            price: item.price,
+            status: 'preparing'
+          })
+          .select()
+          .single();
+        });
+
+      // create the order first
+      const results = await Promise.all(orderPromises);
+    
+      console.log('Orders created:', results);
+
+      // Check if all orders were created successfully
+      const failedOrders = results.filter(result => result.error);
+      if (failedOrders.length > 0) {
+        throw new Error('Failed to create some orders');
+      }
+
+      // Remove the selected items from the cart
+      for (const item of selectedItems) {
+        try {
+          await removeFromCart(item.item_id);
+        } catch (err) {
+          console.error(`Failed to remove item ${item.item_id} from cart:`, err);
+        }
+      }
+    
+      // Update the cart state
+      this.cartItems = this.cartItems.filter(item => 
+        !selectedItemIds.includes(item.id)
+      );
+      this.selectedItems.clear();
+    
+      this.showToast(
+        `Payment of $${paymentAmount.toFixed(2)} successful! Thank you for your order.`, 
+        'success'
+      );
+    
+      // Redirect to the order page
+      setTimeout(() => {
+        this.$router.push('/order');
+      }, 1000);
+    
+    } catch (error) {
+      console.error('Payment failed:', error);
+      this.showToast(
+        `Payment processing failed: ${error.message || 'Please try again.'}`, 
+        'error'
+      );
+    }
     }
   }
 };
@@ -759,6 +997,99 @@ export default {
   gap: 30px;
 }
 
+/* Select All Section */
+.select-all-section {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.select-all-section:hover {
+  border-color: #4CAF50;
+  box-shadow: 0 6px 12px rgba(76, 175, 80, 0.15);
+}
+
+.select-all-checkbox,
+.stall-checkbox,
+.item-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-all-checkbox input[type="checkbox"],
+.stall-checkbox input[type="checkbox"],
+.item-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e0;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  background: white;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+input[type="checkbox"]:indeterminate + .checkbox-custom {
+  background: #9e9e9e;
+  border-color: #9e9e9e;
+}
+
+input[type="checkbox"]:indeterminate + .checkbox-custom::after {
+  content: '−';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.select-all-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.selected-count {
+  font-size: 14px;
+  color: #4CAF50;
+  font-weight: normal;
+  margin-left: 8px;
+}
+
+
+
+/* Stall Groups */
 .stall-group {
   background: white;
   border-radius: 16px;
@@ -781,6 +1112,53 @@ export default {
   color: white;
 }
 
+.stall-checkbox {
+  flex: 1;
+}
+
+.checkbox-custom-stall {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 5px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+}
+
+input[type="checkbox"]:checked + .checkbox-custom-stall {
+  background: white;
+  border-color: white;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom-stall::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #4CAF50;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+input[type="checkbox"]:indeterminate + .checkbox-custom-stall {
+  background: rgba(255,255,255,0.5);
+  border-color: rgba(255,255,255,0.8);
+}
+
+input[type="checkbox"]:indeterminate + .checkbox-custom-stall::after {
+  content: '−';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+}
+
 .stall-name {
   display: flex;
   align-items: center;
@@ -797,6 +1175,17 @@ export default {
 .stall-item-count {
   font-size: 14px;
   opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stall-selected-badge {
+  background: rgba(255,255,255,0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .items-list {
@@ -809,6 +1198,7 @@ export default {
   margin-bottom: 12px;
   background: #f9fafb;
   transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
 .cart-item:last-child {
@@ -817,7 +1207,11 @@ export default {
 
 .cart-item:hover {
   background: #f3f4f6;
-  transform: scale(1.01);
+}
+
+.cart-item.selected {
+  background: #e8f5e9;
+  border-color: #4CAF50;
 }
 
 .cart-item.removing {
@@ -827,9 +1221,35 @@ export default {
 
 .item-main {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+}
+
+.checkbox-custom-item {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #cbd5e0;
+  border-radius: 5px;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  background: white;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom-item {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+
+input[type="checkbox"]:checked + .checkbox-custom-item::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .item-info {
@@ -960,6 +1380,7 @@ export default {
 .stall-subtotal {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 20px 24px;
   background: #f0f9f1;
   font-weight: 600;
@@ -967,9 +1388,20 @@ export default {
   color: #2d5a2f;
 }
 
+.subtotal-breakdown {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .subtotal-amount {
-  color: #4CAF50;
+  color: #666;
   font-size: 18px;
+}
+
+.subtotal-amount.highlighted {
+  color: #4CAF50;
+  font-weight: 700;
 }
 
 /* Cart Summary */
@@ -993,8 +1425,28 @@ export default {
 .summary-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 12px 0;
   color: #666;
+  font-size: 16px;
+}
+
+.info-row {
+  font-size: 14px;
+}
+
+.info-icon {
+  margin-right: 6px;
+}
+
+.info-value {
+  color: #333;
+  font-weight: 600;
+}
+
+.selected-highlight {
+  color: #4CAF50;
+  font-weight: 700;
   font-size: 16px;
 }
 
@@ -1006,6 +1458,16 @@ export default {
   color: #333;
   font-weight: 600;
 }
+
+
+
+.selected-subtotal-row {
+  background: #e8f5e9;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+
 
 .summary-divider {
   height: 2px;
@@ -1026,10 +1488,37 @@ export default {
   color: #1a1a1a;
 }
 
+.total-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
 .total-amount {
   font-size: 28px;
   font-weight: 700;
   color: #4CAF50;
+  transition: all 0.3s ease;
+}
+
+.total-amount.zero-amount {
+  color: #999;
+}
+
+.savings-badge {
+  background: linear-gradient(135deg, #66bb6a 0%, #4CAF50 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .action-buttons {
@@ -1078,9 +1567,45 @@ export default {
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
-.pay-btn:hover {
+.pay-btn:hover:not(.pay-btn-disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
+.pay-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #9e9e9e;
+}
+
+.selection-hint {
+  margin: 0 24px 24px 24px;
+  padding: 16px;
+  background: #fff3cd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #856404;
+  font-size: 14px;
+  font-weight: 500;
+  animation: hint-bounce 2s infinite;
+}
+
+@keyframes hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.hint-icon {
+  font-size: 18px;
+  animation: point 1s infinite;
+}
+
+@keyframes point {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(-10deg); }
 }
 
 /* Responsive Design */
@@ -1101,13 +1626,19 @@ export default {
     font-size: 14px;
   }
 
-  .item-main {
+  .select-all-section {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .item-main {
+    flex-wrap: wrap;
   }
 
   .item-actions {
     width: 100%;
+    flex-wrap: wrap;
     justify-content: space-between;
   }
 
@@ -1151,6 +1682,27 @@ export default {
   .delete-btn {
     width: 40px;
     height: 40px;
+  }
+}
+
+/* Focus styles for accessibility */
+.browse-btn:focus-visible,
+.quantity-btn:focus-visible,
+.delete-btn:focus-visible,
+.clear-btn:focus-visible,
+.pay-btn:focus-visible {
+  outline: 3px solid #4CAF50;
+  outline-offset: 3px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .cart-item {
+    border: 2px solid #333;
+  }
+  
+  .stall-group {
+    border: 2px solid #333;
   }
 }
 </style>

@@ -290,26 +290,25 @@ export default {
 </script>
 
 <style scoped>
+
 /* Hero Section - Bigger Height */
 .hero-section {
-  --navbar-offset: 96px;
   position: relative;
   min-height: 85vh;
   margin-bottom: 3rem;
-  overflow: visible;
-  z-index: 1;
-  padding-top: var(--navbar-offset);
+  overflow:visible;
+  /*allow dropdown to overflow*/
+   padding-top: 90px;
 }
 
 .carousel {
   height: 100%;
   overflow: visible;
+  overflow: visible;
 }
 
 .carousel-inner {
-  height: calc(85vh - var(--navbar-offset));
-  min-height: 420px;
-  z-index: 1;
+  height: 85vh;
 }
 
 .carousel-item {
@@ -338,26 +337,24 @@ export default {
   height: 100%;
   background: linear-gradient(
     135deg,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    rgba(0, 0, 0, 0.6) 100%
+    rgba(255, 107, 53, 0.3) 0%,
+    rgba(255, 140, 66, 0.2) 50%,
+    rgba(0, 0, 0, 0.4) 100%
   );
-  z-index: 2;
 }
 
 /* Hero Content - More padding from top */
-
-
 .hero-content {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  z-index: 20;
+  z-index: 10;
   text-align: center;
   padding: 0 1rem;
   overflow: visible;
+  /*allow dropdown to overflow*/
 }
 
 .hero-title {
@@ -369,8 +366,7 @@ export default {
   margin-bottom: 1.5rem;
   animation: fadeInDown 1s ease-out;
   letter-spacing: 2px;
-  position: relative;
-  z-index: 30;
+  padding-top: 2rem;
 }
 
 .hero-subtitle {
@@ -385,8 +381,6 @@ export default {
   margin-right: auto;
   line-height: 1.7;
   opacity: 0.95;
-  position: relative;
-  z-index: 30;
 }
 
 @keyframes fadeInDown {

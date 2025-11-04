@@ -46,7 +46,7 @@
     </form>
 
     <!-- Trending Hawker Centres -->
-    <div class="trending-section">
+    <div class="trending-section" v-if="showTrending">
       <div class="trending-header">
         <span class="fire-icon">🔥</span>
         <span class="trending-text">Trending:</span>
@@ -70,6 +70,12 @@ import axios from 'axios'
 
 export default {
   name: 'HawkerSearch',
+  props: {
+    showTrending: {
+      type: Boolean,
+      default: true
+    }
+  },
   data() {
     return {
       searchQuery: '',
@@ -78,7 +84,6 @@ export default {
       trendingHawkers: [
         'Maxwell Food Centre',
         'Amoy Street Food Centre',
-        'Bedok Food Centre',
         'Newton Food Centre'
       ],
       url: "https://data.gov.sg/api/action/datastore_search?resource_id=d_68a42f09f350881996d83f9cd73ab02f"
@@ -446,7 +451,4 @@ export default {
   }
 }
 </style>
-
-
-
 

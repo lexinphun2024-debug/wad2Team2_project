@@ -2,6 +2,20 @@
   <div class="d-flex flex-column min-vh-100">
     <!-- NavBar -->
     <NavBar />
+    
+    <transition name="toast-fade">
+      <div 
+        v-if="toast" 
+        class="homepage-toast" 
+        :class="`toast-${toastType}`"
+      >
+        <span class="toast-icon">
+          {{ toastType === 'success' ? '✓' : '⚠️' }}
+        </span>
+        <span class="toast-message">{{ toast }}</span>
+        <button class="toast-close" @click="toast = null">×</button>
+      </div>
+    </transition>
 
     <!-- Hero Carousel with Search -->
     <div class="hero-section">
@@ -50,6 +64,7 @@
               
               <!-- Search Bar for hawker centre name and bring to stall info-->
               <HawkerSearch @search="handleSearch" />
+
             </div>
           </div>
 
@@ -57,66 +72,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Features Section -->
-    <section class="features-section py-5">
-      <div class="container">
-        <h2 class="section-title text-center mb-4">
-          Everything You Need for <br>
-          <span class="highlight-text">Perfect Meal</span>
-        </h2>
-        <p class="section-subtitle text-center mb-5 mx-auto">
-          Your comprehensive platform brings together all tools you need to discover, order, and enjoy 
-          Singapore's incredible hawker food scene.
-        </p>
-        
-        <div class="row g-4">
-          <!-- Feature 1: Stall Information -->
-          <div class="col-md-6">
-            <div class="feature-card h-100">
-              <div class="feature-icon">📋</div>
-              <h3 class="feature-title">Stall Information</h3>
-              <p class="feature-description">
-                Access detailed information about each hawker stall instantly. View food menu that stall offered
-                to make informed dining decisions
-              </p>
-            </div>
-          </div>
-          
-          <!-- Feature 2: Interactive Map -->
-           <div class="col-md-6">
-            <div class="feature-card h-100" @click="goToMap" style="cursor: pointer;">
-              <div class="feature-icon">🗺️</div>
-              <h3 class="feature-title">Interactive Map</h3>
-              <p class="feature-description"> Discover nearby hawker centres with our interactive map. Find directions, distance, and travel time instantly.</p>
-            </div>
-          </div>
-
-          <!-- Feature 3: Smart Recommendation -->
-          <div class="col-md-6">
-            <div class="feature-card h-100">
-              <div class="feature-icon">🤖</div>
-              <h3 class="feature-title">Smart Recommendation</h3>
-              <p class="feature-description">
-                Receive intelligent suggestions for alternative hawker centres when your preferred location is closed for maintenance
-              </p>
-            </div>
-          </div>
-
-          <!-- Feature 4: Pre-Order Advance -->
-          <div class="col-md-6">
-            <div class="feature-card h-100">
-              <div class="feature-icon">⏰</div>
-              <h3 class="feature-title">Pre-Order Advance</h3>
-              <p class="feature-description">
-                Skip the queue by ordering your favourite dish ahead of time. Schedule pickups secure your meals
-                during peak hours with our seamless pre-ordering system
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- Popular Stalls Section -->
     <section class="popular-stalls-section py-5">
@@ -156,13 +111,24 @@
                   </div>
 
                   <div class="dish-list">
-                    <div class="dish-item" v-for="(dish, idx) in stall.dishes" :key="idx">
+                    <div 
+                      class="dish-item" 
+                      v-for="(dish, idx) in stall.dishes" 
+                      :key="dish.itemId || idx"
+                      :class="{ 'is-adding': addingDishId === dish.itemId }"
+                      role="button"
+                      tabindex="0"
+                      :aria-label="`Add ${dish.name} from ${stall.cartStallName || stall.name} to cart`"
+                      @click="handleDishClick(stall, dish)"
+                      @keydown.enter.prevent="handleDishClick(stall, dish)"
+                      @keydown.space.prevent="handleDishClick(stall, dish)"
+                    >
                       <div class="dish-info">
                         <span class="dish-number">{{ idx + 1 }}</span>
                         <span class="dish-name">{{ dish.name }}</span>
-                        <span class="dish-orders">{{ dish.orders }} orders</span>
+                        <span class="dish-orders">{{ formatOrders(dish.orders) }} orders</span>
                       </div>
-                      <span class="dish-price">{{ dish.price }}</span>
+                      <span class="dish-price">{{ formatPrice(dish.price) }}</span>
                     </div>
                   </div>
                 </div>
@@ -225,6 +191,7 @@
 <script>
 import NavBar from '@/components/NavBar.vue'
 import HawkerSearch from '@/components/HawkerSearch.vue'
+import { addToCart } from '@/services/supabaseService'
 
 export default {
   name: 'HomePage',
@@ -241,49 +208,109 @@ export default {
       },
       topStalls: [
         {
-          name: 'Tian Tian Hainanese Chicken Rice',
+          name: 'Tian Tian Chicken Rice',
           location: 'Maxwell Food Centre',
-          description: 'Legendary chicken rice stall famous for its tender, succulent chicken served with fragrant rice cooked in chicken stock. A must-try for both locals and tourists.',
+          description: 'Legendary chicken rice stall famous for tender poached chicken and fragrant rice cooked in rich chicken stock. A must-try for both locals and tourists.',
+          stallId: 1,
+          cartStallName: 'Tian Tian Chicken Rice',
           dishes: [
-            { name: 'Roasted Chicken Rice', price: '$4.50', orders: '2,847' },
-            { name: 'Steamed Chicken Rice', price: '$4.00', orders: '2,156' },
-            { name: 'Mixed Chicken Rice', price: '$5.00', orders: '1,923' }
+            { itemId: 1, name: 'Hainanese Chicken Rice', price: 5.5, orders: 120 },
+            { itemId: 9, name: 'Chicken Rice Set Meal', price: 7, orders: 90 },
+            { itemId: 2, name: 'Roast Chicken Rice', price: 5.8, orders: 80 }
           ]
         },
         {
-          name: 'Liao Fan Hawker Chan',
-          location: 'Chinatown Complex',
-          description: 'Singapore\'s first Michelin-starred street food stall. Known worldwide for its incredibly flavorful soy sauce chicken with a perfect balance of sweet and savory.',
+          name: 'A Noodle Story',
+          location: 'Amoy Street Food Centre',
+          description: 'Singapore-style ramen that blends local flavours with Japanese technique, complete with sous vide char siu and molten-centre egg.',
+          stallId: 41,
+          cartStallName: 'A Noodle Story',
           dishes: [
-            { name: 'Soy Sauce Chicken Rice', price: '$3.80', orders: '3,421' },
-            { name: 'Char Siew Rice', price: '$4.50', orders: '2,654' },
-            { name: 'BBQ Pork Noodles', price: '$4.00', orders: '1,876' }
+            { itemId: 49, name: 'Singapore-Style Ramen', price: 9, orders: 120 },
+            { itemId: 50, name: 'Char Siu Ramen', price: 10, orders: 95 },
+            { itemId: 51, name: 'Truffle Wanton Mee', price: 11, orders: 70 }
           ]
         },
         {
-          name: 'Hill Street Tai Hwa Pork Noodle',
-          location: 'Crawford Lane',
-          description: 'Award-winning Bak Chor Mee with springy noodles, minced pork, and signature chili. The first street food stall in Singapore to earn a Michelin star.',
+          name: 'Han Kee Fish Soup',
+          location: 'Amoy Street Food Centre',
+          description: 'Ultra-fresh Teochew-style fish soup with generous sliced fish portions and a naturally sweet broth that draws daily queues.',
+          stallId: 42,
+          cartStallName: 'Han Kee Fish Soup',
           dishes: [
-            { name: 'Minced Meat Noodle', price: '$6.00', orders: '2,234' },
-            { name: 'Mushroom Minced Noodle', price: '$7.00', orders: '1,987' },
-            { name: 'Special Dry Noodle', price: '$8.00', orders: '1,543' }
+            { itemId: 59, name: 'Sliced Fish Soup', price: 6, orders: 130 },
+            { itemId: 60, name: 'Mixed Fish Soup', price: 7, orders: 90 },
+            { itemId: 62, name: 'Sliced Fish Bee Hoon', price: 6.5, orders: 85 }
           ]
         }
-      ]
+      ],
+      toast: null,
+      toastType: 'success',
+      toastTimeout: null,
+      addingDishId: null
     }
   },
   methods: {
-    handleSearch(hawkerName) { //the input from hawker centre search (hawker name)
+    handleSearch(hawkerName) { // the input from hawker centre search (hawker name)
+      const trimmed = (hawkerName || '').trim()
+      if (!trimmed) return
+
       this.$router.push({
-        name: 'StallInfo',
-        params: { hawkerName }
+        name: 'HawkerActions',
+        params: { hawkerName: trimmed }
       })
     },
-    goToMap() {
-      this.$router.push({
-        name: 'FindLocator'
-      })
+    formatPrice(value) {
+      const numberValue = Number(value) || 0
+      return `$${numberValue.toFixed(2)}`
+    },
+    formatOrders(value) {
+      const numberValue = Number(value) || 0
+      return numberValue.toLocaleString()
+    },
+    async handleDishClick(stall, dish) {
+      if (this.addingDishId === dish.itemId) {
+        return
+      }
+
+      this.addingDishId = dish.itemId
+
+      try {
+        await addToCart(
+          stall.stallId,
+          stall.cartStallName || stall.name,
+          dish.itemId,
+          dish.cartItemName || dish.name,
+          Number(dish.price)
+        )
+        this.showToast(`${dish.name} added to cart!`)
+      } catch (error) {
+        console.error('Error adding dish to cart:', error)
+        const message = error?.message?.toLowerCase().includes('not logged in')
+          ? 'Please log in to add items to your cart.'
+          : 'Unable to add that dish to your cart. Please try again.'
+        this.showToast(message, 'error')
+      } finally {
+        this.addingDishId = null
+      }
+    },
+    showToast(message, type = 'success') {
+      this.toast = message
+      this.toastType = type
+
+      if (this.toastTimeout) {
+        clearTimeout(this.toastTimeout)
+      }
+
+      this.toastTimeout = setTimeout(() => {
+        this.toast = null
+        this.toastTimeout = null
+      }, 3000)
+    }
+  },
+  beforeUnmount() {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout)
     }
   }
 }
@@ -665,11 +692,24 @@ export default {
   border-radius: 12px;
   border-left: 4px solid #ff8c42;
   transition: all 0.3s ease;
+  cursor: pointer;
+  outline: none;
 }
 
 .dish-item:hover {
   transform: translateX(5px);
   box-shadow: 0 4px 15px rgba(255, 140, 66, 0.15);
+}
+
+.dish-item:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.3),
+              0 12px 24px rgba(255, 140, 66, 0.2);
+  transform: translateX(5px);
+}
+
+.dish-item.is-adding {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .dish-info {
@@ -718,6 +758,62 @@ export default {
   color: #d97556;
   flex-shrink: 0;
   margin-left: 1rem;
+}
+
+.homepage-toast {
+  position: fixed;
+  top: 90px;
+  right: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid #28a745;
+  z-index: 1100;
+  font-family: 'Poppins', sans-serif;
+  min-width: 240px;
+}
+
+.homepage-toast.toast-error {
+  border-left-color: #dc3545;
+}
+
+.toast-icon {
+  font-size: 1.1rem;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #7f8c8d;
+  line-height: 1;
+  padding: 0;
+}
+
+.toast-close:hover {
+  color: #2c3e50;
+}
+
+.toast-fade-enter-active,
+.toast-fade-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-fade-enter-from,
+.toast-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 /* Enhanced Footer */

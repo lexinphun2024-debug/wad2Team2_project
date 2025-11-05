@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = "https://tjfnvvjwiscwhxwirlua.supabase.co"
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqZm52dmp3aXNjd2h4d2lybHVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NDU3OTYsImV4cCI6MjA3NzAyMTc5Nn0.pUaPRyffG6smNeQZxXTJaPzsgueRkaT2lPiTiw3rExA"
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-//HAWKER CENTRE SELECTED SHOW ALL STALL INFO
 
 // Fetch stalls by hawker centre name --> user select 'all'
 export const getStallsByHawkerName = async (hawkerCentreName) => {
@@ -60,7 +59,7 @@ export const getCuisineTypesByHawker = async (hawkerCentreName) => {
 }
 
 
-//menu info
+//retrieve information by stall id
 export const getStallById = async (stallId) => {
   try {
     const { data, error } = await supabase
@@ -77,7 +76,7 @@ export const getStallById = async (stallId) => {
   }
 }
 
-// MENU ITEMS FOR A STALL THAT SELECTED
+
 
 // Fetch all menu items for a stall
 export const getMenuItemsByStall = async (stallId) => {
@@ -295,12 +294,11 @@ export async function getAllCartItems() {
        .eq("user_id", user.id);
 
     if (error) {
-      // Return empty array if there's any error (table doesn't exist, no data, etc.)
+    
       return [];
     }
     return data || [];
   } catch (error) {
-    // Silently fail and return empty array
     return [];
   }
 }
@@ -364,28 +362,6 @@ export async function getUserOrders(userId) {
   } catch (error) {
     console.error('Error getting user orders:', error);
     return [];
-  }
-}
-
-// Add new order after user made successful payment
-export async function addOrder(userId, items, totalAmount) {
-  try {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        user_id: userId,
-        items: JSON.stringify(items), // store array of items
-        total_amount: totalAmount,
-        status: 'preparing',
-        created_at: new Date()
-      })
-      .select()
-      .maybeSingle();
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error adding order:', error);
-    throw error;
   }
 }
 

@@ -39,7 +39,7 @@
             <div class="status-banner" :class="'banner-' + orderGroup.status">
               <span class="status-text">
                 <span class="status-icon">
-                  {{ orderGroup.status === 'preparing' ? '👨‍🍳' : '✅' }}
+                  {{ orderGroup.status === 'preparing' ? '👨‍🍳' : '🎉' }}
                 </span>
                 {{ statusText(orderGroup.status) }}
               </span>
@@ -179,12 +179,14 @@ export default {
         const groups = {};
 
         this.orders.forEach(order => {
-        const groupKey = order.id; //for one purchase, one order
+        const groupKey = order.group_id;
+        //each purchase order will have different group_id
+        //go through each order item
 
         // create group for each individual order palced
         if (!groups[groupKey]) {
             groups[groupKey] = {
-                groupId: order.id,
+                groupId: order.group_id,
                 created_at: order.created_at,
                 status: order.status,
                 items: [],
@@ -202,6 +204,7 @@ export default {
             groups[groupKey].itemsByStall[stallName] = [];
         }
         groups[groupKey].itemsByStall[stallName].push(order);
+        //add the food item order by the stallname then by the group_id
 
         // add the total for that group of order
         groups[groupKey].total += order.price * order.quantity;
@@ -211,12 +214,14 @@ export default {
     },
     
     currentOrderGroups() {
+      //filter only active order(not completed order yet)
       return Object.values(this.groupedOrders)
         .filter(g => g.status !== 'completed')
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     },
     
     completedOrderGroups() {
+      //completed order
       return Object.values(this.groupedOrders)
         .filter(g => g.status === 'completed')
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -233,6 +238,7 @@ export default {
     }
   },
   methods: {
+    //load the order that belong to the users
     async loadOrders() {
       this.loading = true;
       try {
@@ -303,6 +309,7 @@ export default {
       }
     },
 
+    //the created_order time
     formatTime(timestamp) {
       const date = new Date(timestamp);
       const now = new Date();
@@ -314,6 +321,8 @@ export default {
       return date.toLocaleDateString();
     },
 
+    //the preparation food period
+
     getProgress(orderGroup) {
       const created = new Date(orderGroup.created_at);
       const now = new Date();
@@ -322,6 +331,8 @@ export default {
       return Math.min((elapsed / total) * 100, 100);
     },
 
+
+    // the update of food item to be ready
     getEstimatedTime(orderGroup) {
       const created = new Date(orderGroup.created_at);
       const now = new Date();
@@ -332,6 +343,7 @@ export default {
       return `${Math.ceil(remaining / 60)}m`;
     },
 
+    //to see the completed order
     toggleCompleted() {
       this.showCompleted = !this.showCompleted;
     }

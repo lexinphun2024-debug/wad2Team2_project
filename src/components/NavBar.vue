@@ -75,6 +75,8 @@
       </div>
     </nav>
 
+    
+
     <!-- Log out message box -->
     <transition name="fade">
       <div v-if="showLogoutConfirm" class="modal-overlay" @click.self="showLogoutConfirm = false">
@@ -182,7 +184,6 @@ export default {
           this.username = user.user_metadata?.username || 
                          user.email?.split('@')[0] || 
                          'User'
-          console.log('User logged in:', this.username)
           
           // update the order count when user login in successful
           await this.updateOrdersCount();

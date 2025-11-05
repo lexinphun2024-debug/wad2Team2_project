@@ -10,7 +10,7 @@
       <h1 class="hawker-name">{{ hawkerName }}</h1>
     </div>
 
-    <!-- Category Filter -->
+    <!-- cuisine category filter-->
     <div class="category-filter">
       <button 
         v-for="category in categories" 
@@ -28,7 +28,7 @@
       <p>Loading stalls...</p>
     </div>
 
-    <!-- Stalls Grid -->
+    <!-- Stall information part -->
     <div v-else-if="filteredStalls.length > 0" class="stalls-grid">
       <div 
         v-for="stall in filteredStalls" 
@@ -318,7 +318,7 @@ export default {
     openStallDetail(stall) {
       // Navigate to menu info page
       this.$router.push({ 
-        name: 'MenuInfo', 
+        name: 'StallAction', 
         params: { stallId: stall.id }
       })
     },
@@ -358,7 +358,7 @@ export default {
   padding-bottom: 2rem;
 }
 
-/* Header */
+/* Header part */
 .header {
   background: linear-gradient(135deg, #eeb264 0%, #da7644 80%);
   color:  white;
@@ -405,7 +405,7 @@ export default {
   flex: 1;
 }
 
-/* Category Filter */
+/*cuisine category filter*/
 .category-filter {
   display: flex;
   gap: 0.5rem;
@@ -420,11 +420,6 @@ export default {
 
 .category-filter::-webkit-scrollbar {
   height: 4px;
-}
-
-.category-filter::-webkit-scrollbar-thumb {
-  background: #667eea;
-  border-radius: 4px;
 }
 
 .category-btn {
@@ -451,7 +446,7 @@ export default {
   border-color: transparent;
 }
 
-/* Loading */
+/* Loading state part */
 .loading {
   display: flex;
   flex-direction: column;
@@ -475,7 +470,7 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-/* Stalls Grid */
+/* Stall information part */
 .stalls-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

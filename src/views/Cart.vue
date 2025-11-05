@@ -247,7 +247,7 @@
 <script>
 import NavBar from '@/components/NavBar.vue';
 import { supabase, getAllCartItems, updateCartItemQuantity, 
-  removeFromCart, clearCart, addOrder } from "@/services/supabaseService";
+  removeFromCart, clearCart } from "@/services/supabaseService";
 
 export default {
   name: 'Cart',
@@ -549,12 +549,16 @@ export default {
           }
 
         // Get only selected food item
+
+        //convert to set of array of ids
         const selectedItemIds = Array.from(this.selectedItems);
+        
+        //filter the cart with the only selected items
         const selectedItems = this.cartItems.filter(item => 
         selectedItemIds.includes(item.id)
        );
 
-      // Validate that items are selected
+      //check if the user not selected any food item, give an error
       if (selectedItems.length === 0) {
         this.showToast('Please select items to purchase.', 'error');
         return;
@@ -562,15 +566,17 @@ export default {
 
       const paymentAmount = this.selectedTotal;
 
-      //console.log('Processing payment for items:', selectedItems);
-      //console.log('Total amount:', paymentAmount);
+      //create a unique purchase order id each time
+      const groupId = `${user.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       // Insert each item as a separate order row
       const orderPromises = selectedItems.map(item => {
+        //for each food item, add into order row
         return supabase
           .from('orders')
           .insert({
             user_id: user.id,
+            group_id : groupId,
             item_id: item.item_id,
             item_name: item.item_name,
             stall_id: item.stall_id || null,
@@ -583,10 +589,9 @@ export default {
           .single();
         });
 
-      // create the order first
+      // wait until all the purcahse food item order is being created(each)
       const results = await Promise.all(orderPromises);
     
-      console.log('Orders created:', results);
 
       // Check if all orders were created successfully
       const failedOrders = results.filter(result => result.error);
@@ -594,7 +599,7 @@ export default {
         throw new Error('Failed to create some orders');
       }
 
-      // Remove the selected items from the cart
+      // Remove the selected items from the cart once purchsase order created
       for (const item of selectedItems) {
         try {
           await removeFromCart(item.item_id);
@@ -604,6 +609,8 @@ export default {
       }
     
       // Update the cart state
+
+      //remove the selected item that has already purchased
       this.cartItems = this.cartItems.filter(item => 
         !selectedItemIds.includes(item.id)
       );

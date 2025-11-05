@@ -6,6 +6,7 @@ import Cart from '../views/Cart.vue'
 import Login from '../views/Login.vue'
 import Order from '../views/Order.vue'
 import HawkerActions from '../views/HawkerActions.vue'
+import StallAction from '../views/StallAction.vue'
 
 const history = createWebHistory()
 const routes = [
@@ -31,9 +32,17 @@ const routes = [
     component:  StallInfo,
     props: true
   },
+  {
+    //accordingly to stallid
+    path: '/stall/:stallId',
+    name: 'StallAction',
+    component: StallAction,
+    props: true
+  },
 
   {
-    path: '/menu/:stallId',
+    //accordingly to stallid
+    path: '/stall/:stallId/menu',
     name: 'MenuInfo',
     component: MenuInfo,
     props: true

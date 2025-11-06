@@ -10,7 +10,19 @@
           <span class="brand-text">EasyEat</span>
         </router-link>
         
-        <div class="navbar-collapse" id="navbar">
+        <button 
+          class="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbar"
+          aria-controls="navbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar">
           <ul class="navbar-nav ms-auto align-items-center">
             <li class="nav-item">
               <router-link class="nav-link" to="/order" active-class="active">
@@ -839,41 +851,33 @@ export default {
   }
 
   .navbar-collapse {
-    flex: 1 0 auto;
-    display: flex !important;
-    justify-content: flex-end;
-    align-items: center;
+    width: 100%;
+    margin-top: 0.75rem;
   }
 
   .navbar-nav {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 0.35rem;
-    padding-top: 0;
-    width: 100%;
-  }
-
-  .navbar-nav .nav-item {
-    flex: 0 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
   }
 
   .nav-link {
-    padding: 0.55rem 0.85rem !important;
-    font-size: 0.9rem;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.65rem 1.1rem !important;
+    font-size: 1rem;
   }
 
   .btn-login {
-    width: auto;
+    width: 100%;
     justify-content: center;
-    margin-top: 0;
-    padding: 0.55rem 1.1rem;
-    font-size: 0.9rem;
+    margin-top: 0.5rem;
   }
 
   .btn-user {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    width: 100%;
+    justify-content: space-between;
   }
 }
 

@@ -250,6 +250,9 @@ const STALL_IMAGE_MAP = {
 
 export default {
   name: 'StallInfo',
+   components: {
+    NavBar
+  },
   props: {
     hawkerName: {
       type: String,
@@ -368,8 +371,7 @@ export default {
   align-items: center;
   gap: 1rem;
   position: sticky;
-  top: 0;
-  margin-top: calc(var(--navbar-height, 90px) * -1);
+  top: var(--navbar-height, 90px);
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -416,7 +418,7 @@ export default {
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: 72px;
+  top: calc(var(--navbar-height, 90px) + 70px);
   z-index: 99;
   margin-bottom: 5rem;
 }
@@ -606,7 +608,7 @@ export default {
   }
 
   .category-filter {
-    top: 68px;
+    top: calc(var(--navbar-height, 90px) + 60px);
   }
 }
 

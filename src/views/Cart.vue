@@ -645,7 +645,7 @@ export default {
 .cart-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
-  padding-top: calc(var(--navbar-height, 90px) + 20px);
+  padding-top: calc(var(--navbar-height, 90px) + 8px);
 }
 
 .cart-content {
@@ -1623,7 +1623,7 @@ input[type="checkbox"]:checked + .checkbox-custom-item::after {
   }
 
   .cart-header h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .cart-icon {

@@ -1,5 +1,8 @@
 <template>
-  <header :class="['navbar-wrapper', { 'scrolled': isScrolled }]">
+  <header
+    ref="navbarWrapper"
+    :class="['navbar-wrapper', { 'scrolled': isScrolled }]"
+  >
     <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
         <router-link class="navbar-brand" to="/">
@@ -12,6 +15,9 @@
           type="button" 
           data-bs-toggle="collapse" 
           data-bs-target="#navbar"
+          aria-controls="navbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -129,10 +135,30 @@ export default {
       showLogoutConfirm: false,
       loggingOut: false,
       alertMessage: '',
-      alertType: 'success'
+      alertType: 'success',
+      navbarObserver: null,
+      resizeListenerBound: false
     }
   },
   methods: {
+    setNavbarHeight(height) {
+      if (!height) {
+        return
+      }
+      const value = `${Math.ceil(height)}px`
+      document.documentElement.style.setProperty('--navbar-height', value)
+      document.body.style.setProperty('--navbar-height', value)
+    },
+    updateNavbarHeight() {
+      this.$nextTick(() => {
+        const el = this.$refs.navbarWrapper
+        if (!el) return
+        const height = el.getBoundingClientRect().height
+        if (height) {
+          this.setNavbarHeight(height)
+        }
+      })
+    },
     handleLogin() {
       this.$router.push('/login')
     },
@@ -260,12 +286,33 @@ export default {
   async mounted() {
     window.addEventListener('scroll', this.handleScroll);
     document.addEventListener('click', this.handleClickOutside);
+    document.body.classList.add('has-fixed-navbar');
+
+    this.updateNavbarHeight()
+
+    if (window.ResizeObserver) {
+      this.navbarObserver = new ResizeObserver((entries) => {
+        if (!entries || !entries.length) return
+        const { height } = entries[0].contentRect || {}
+        if (height) {
+          this.setNavbarHeight(height)
+        }
+      })
+      if (this.$refs.navbarWrapper) {
+        this.navbarObserver.observe(this.$refs.navbarWrapper)
+      }
+    } else if (!this.resizeListenerBound) {
+      window.addEventListener('resize', this.updateNavbarHeight)
+      this.resizeListenerBound = true
+    }
     
     // Check if user is logged in
     await this.checkUser();
     
     // Update cart count immediately
     await this.updateCartCount();
+
+    this.updateNavbarHeight()
     
     this.cartInterval = setInterval(this.updateCartCount, 2000);
     
@@ -283,9 +330,22 @@ export default {
     }, 5000);
   },
   
+  updated() {
+    this.updateNavbarHeight()
+  },
+  
   beforeUnmount() {
+    document.body.classList.remove('has-fixed-navbar');
     window.removeEventListener('scroll', this.handleScroll);
     document.removeEventListener('click', this.handleClickOutside);
+    if (this.navbarObserver) {
+      this.navbarObserver.disconnect();
+      this.navbarObserver = null;
+    }
+    if (this.resizeListenerBound) {
+      window.removeEventListener('resize', this.updateNavbarHeight);
+      this.resizeListenerBound = false;
+    }
 
     // Clear intervals for cart and orders
     if (this.cartInterval) {
@@ -318,6 +378,13 @@ export default {
   background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
   padding: 1rem 0;
   transition: all 0.3s ease;
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .navbar-brand {
@@ -775,14 +842,42 @@ export default {
 }
 
 @media (max-width: 991px) {
-  .navbar-nav {
-    padding-top: 1rem;
-    gap: 0.5rem;
+  .navbar .container {
+    justify-content: space-between;
   }
+
+  .navbar-brand {
+    flex: 0 0 auto;
+  }
+
+  .navbar-collapse {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .navbar-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  .nav-link {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.65rem 1.1rem !important;
+    font-size: 1rem;
+  }
+
   .btn-login {
     width: 100%;
     justify-content: center;
     margin-top: 0.5rem;
+  }
+
+  .btn-user {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 

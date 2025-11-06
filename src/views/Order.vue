@@ -355,8 +355,7 @@ export default {
 .order-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-  padding: 100px 20px 20px;
-  /*can shift down below the navbar */
+  padding: 0 20px 20px;
 }
 
 /* Loading part */
@@ -368,6 +367,7 @@ export default {
   min-height: 60vh;
   color: white;
   gap: 20px;
+  margin-top: calc(var(--navbar-height, 90px) + 20px);
 }
 
 .spinner {
@@ -393,6 +393,7 @@ export default {
   color: white;
   text-align: center;
   gap: 15px;
+  margin-top: calc(var(--navbar-height, 90px) + 20px);
 }
 
 .empty-state h3 {
@@ -425,7 +426,7 @@ export default {
 /* Orders Content */
 .orders-content {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: calc(var(--navbar-height, 90px) + 20px) auto 0;
 }
 
 .orders-section {

@@ -79,6 +79,7 @@ export default {
 .hawker-actions-page {
   min-height: 100vh;
   background: linear-gradient(180deg, rgba(248, 249, 250, 0.4) 0%, #ffffff 60%);
+  padding-top: calc(var(--navbar-height, 90px) + 20px);
 }
 
 .actions-card {

@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '../views/HomePage.vue'
-import StallInfo from '../views/StallInfo.vue'
-import MenuInfo from '../views/Menuinfo.vue'
-import Cart from '../views/Cart.vue'
-import Login from '../views/Login.vue'
-import Order from '../views/Order.vue'
-import HawkerActions from '../views/HawkerActions.vue'
-import StallAction from '../views/StallAction.vue'
+const HomePage = () => import('../views/HomePage.vue')
+const StallInfo = () => import('../views/StallInfo.vue')
+const MenuInfo = () => import('../views/Menuinfo.vue')
+const Cart = () => import('../views/Cart.vue')
+const Login = () => import('../views/Login.vue')
+const Order = () => import('../views/Order.vue')
+const HawkerActions = () => import('../views/HawkerActions.vue')
+const StallAction = () => import('../views/StallAction.vue')
 
 const history = createWebHistory()
 const routes = [

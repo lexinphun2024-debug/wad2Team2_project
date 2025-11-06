@@ -356,18 +356,20 @@ export default {
   min-height: 100vh;
   background-color: #f8f9fa;
   padding-bottom: 2rem;
+  padding-top: 0;
 }
 
 /* Header part */
 .header {
   background: linear-gradient(135deg, #eeb264 0%, #da7644 80%);
   color:  white;
-  padding: 1rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   position: sticky;
   top: 0;
+  margin-top: calc(var(--navbar-height, 90px) * -1);
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -416,6 +418,7 @@ export default {
   position: sticky;
   top: 72px;
   z-index: 99;
+  margin-bottom: 5rem;
 }
 
 .category-filter::-webkit-scrollbar {

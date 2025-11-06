@@ -56,7 +56,7 @@
           <div class="hero-content">
             <div class="container">
               <h1 class="hero-title">
-                Hawker Centre Hub
+                HAWKER CENTRE HUB
               </h1>
               <p class="hero-subtitle">
                 One-stop platform to find queues, seats, stalls, and nearest locations
@@ -144,7 +144,7 @@
       <div class="footer-cta py-5">
         <div class="container text-center">
           <h2 class="cta-title mb-4">Ready to Start Your Hawker Food Journey?</h2>
-          <button class="cta-button">Get Started Now</button>
+          <button class="cta-button" type="button" @click="goToLogin">Get Started Now</button>
         </div>
       </div>
       
@@ -268,6 +268,9 @@ export default {
       const numberValue = Number(value) || 0
       return numberValue.toLocaleString()
     },
+    goToLogin() {
+      this.$router.push('/login')
+    },
     async handleDishClick(stall, dish) {
       if (this.addingDishId === dish.itemId) {
         return
@@ -325,7 +328,7 @@ export default {
   margin-bottom: 3rem;
   overflow:visible;
   /*allow dropdown to overflow*/
-   padding-top: 90px;
+  padding-top: calc(var(--navbar-height, 90px) + 16px);
 }
 
 .carousel {
@@ -373,7 +376,7 @@ export default {
 /* Hero Content - More padding from top */
 .hero-content {
   position: absolute;
-  top: 45%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -385,8 +388,8 @@ export default {
 }
 
 .hero-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 4.5rem;
+  font-family: 'Cooper Black', 'CooperBlack', 'Georgia', serif;
+  font-size: 4rem;
   font-weight: 800;
   color: white;
   text-shadow: 3px 3px 20px rgba(0, 0, 0, 0.6);
@@ -852,12 +855,26 @@ export default {
   background: linear-gradient(135deg, #fff5f0 0%, #ffe8d6 100%);
 }
 
+.footer-stats .row {
+  align-items: stretch;
+}
+
+.footer-stats .col-4 {
+  display: flex;
+}
+
 .stat-card {
   background: white;
   border-radius: 20px;
   padding: 2rem 1.5rem;
   box-shadow: 0 8px 25px rgba(255, 140, 66, 0.15);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 }
 
 .stat-card:hover {
@@ -872,13 +889,19 @@ export default {
 
 .stat-number {
   font-family: 'Poppins', sans-serif;
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ff6b35;
   margin-bottom: 0.5rem;
+}
+
+@supports (-webkit-background-clip: text) {
+  .stat-number {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 .stat-label {
@@ -934,6 +957,7 @@ export default {
   
   .hero-subtitle {
     font-size: 1.1rem;
+    margin-bottom: 1.5rem;
   }
   
   .carousel-inner {

@@ -389,6 +389,7 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   font-family: 'Poppins', sans-serif;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .trending-tag:hover {
@@ -448,7 +449,15 @@ export default {
   
   .trending-tags {
     display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.6rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .trending-tags::-webkit-scrollbar {
+    display: none;
   }
 }
 </style>
-

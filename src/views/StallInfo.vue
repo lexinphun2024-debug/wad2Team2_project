@@ -356,7 +356,7 @@ export default {
   min-height: 100vh;
   background-color: #f8f9fa;
   padding-bottom: 2rem;
-  padding-top: calc(var(--navbar-height, 90px) + 16px);
+  padding-top: calc(var(--navbar-height, 90px) + 8px);
 }
 
 /* Header part */

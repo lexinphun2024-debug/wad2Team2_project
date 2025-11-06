@@ -889,7 +889,7 @@ export default {
 
 .stat-number {
   font-family: 'Poppins', sans-serif;
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 800;
   color: #ff6b35;
   margin-bottom: 0.5rem;

@@ -16,6 +16,49 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
+        <div class="mobile-actions d-lg-none">
+          <router-link class="mobile-action-link" to="/order" active-class="active">
+            <span class="icon">📋</span>
+            <span class="label">Orders</span>
+            <span class="badge" v-if="ordersCount > 0">{{ ordersCount }}</span>
+          </router-link>
+          <router-link class="mobile-action-link" to="/cart" active-class="active">
+            <span class="icon">🛒</span>
+            <span class="label">Cart</span>
+            <span class="badge" v-if="cartCount > 0">{{ cartCount }}</span>
+          </router-link>
+          
+          <button 
+            v-if="!user" 
+            class="mobile-action-link mobile-login" 
+            @click="handleLogin"
+          >
+            <span class="icon">🔑</span>
+            <span class="label">Login</span>
+          </button>
+          
+          <div v-else class="user-menu mobile-user-menu">
+            <button 
+              class="mobile-action-link mobile-login" 
+              @click="toggleUserMenu"
+            >
+              <span class="icon">👤</span>
+              <span class="label">{{ username || 'User' }}</span>
+              <span class="dropdown-arrow">▼</span>
+            </button>
+            <transition name="fade-slide">
+              <div v-if="showUserMenu" class="user-dropdown mobile-dropdown">
+                <div class="user-info">
+                  <div class="user-email">{{ user.email }}</div>
+                </div>
+                <button class="dropdown-item logout-btn" @click="confirmLogout">
+                  <span>Logout</span>
+                </button>
+              </div>
+            </transition>
+          </div>
+        </div>
+
         <div class="collapse navbar-collapse" id="navbar">
           <ul class="navbar-nav ms-auto align-items-center">
             <li class="nav-item">
@@ -349,6 +392,74 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.mobile-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 107, 53, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.mobile-action-link .icon {
+  font-size: 1.1rem;
+}
+
+.mobile-action-link .badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 12px;
+  min-width: 18px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.mobile-action-link:hover,
+.mobile-action-link.active,
+.mobile-action-link:focus-visible {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.35);
+}
+
+.mobile-login {
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-login .dropdown-arrow {
+  font-size: 0.65rem;
+}
+
+.mobile-user-menu {
+  position: relative;
+}
+
+.mobile-dropdown {
+  min-width: 180px;
+  right: 0;
 }
 
 .navbar-nav {
@@ -783,6 +894,13 @@ export default {
     width: 100%;
     justify-content: center;
     margin-top: 0.5rem;
+  }
+  .mobile-actions {
+    gap: 0.35rem;
+  }
+  .mobile-action-link {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
   }
 }
 

@@ -144,7 +144,7 @@
       <div class="footer-cta py-5">
         <div class="container text-center">
           <h2 class="cta-title mb-4">Ready to Start Your Hawker Food Journey?</h2>
-          <button class="cta-button">Get Started Now</button>
+          <button class="cta-button" type="button" @click="goToLogin">Get Started Now</button>
         </div>
       </div>
       
@@ -267,6 +267,9 @@ export default {
     formatOrders(value) {
       const numberValue = Number(value) || 0
       return numberValue.toLocaleString()
+    },
+    goToLogin() {
+      this.$router.push('/login')
     },
     async handleDishClick(stall, dish) {
       if (this.addingDishId === dish.itemId) {
@@ -852,12 +855,26 @@ export default {
   background: linear-gradient(135deg, #fff5f0 0%, #ffe8d6 100%);
 }
 
+.footer-stats .row {
+  align-items: stretch;
+}
+
+.footer-stats .col-4 {
+  display: flex;
+}
+
 .stat-card {
   background: white;
   border-radius: 20px;
   padding: 2rem 1.5rem;
   box-shadow: 0 8px 25px rgba(255, 140, 66, 0.15);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 }
 
 .stat-card:hover {
@@ -874,11 +891,17 @@ export default {
   font-family: 'Poppins', sans-serif;
   font-size: 2.2rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #ff6b35;
   margin-bottom: 0.5rem;
+}
+
+@supports (-webkit-background-clip: text) {
+  .stat-number {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 .stat-label {

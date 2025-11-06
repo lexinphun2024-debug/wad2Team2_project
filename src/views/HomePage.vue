@@ -59,7 +59,7 @@
                 HAWKER CENTRE HUB
               </h1>
               <p class="hero-subtitle">
-                A one-stop platform to pre-order food, check queue lengths, and locate nearby stalls.
+                Pre-order hawker food, track queue times, and find stalls nearby.
               </p>
               
               <!-- Search Bar for hawker centre name and bring to stall info-->

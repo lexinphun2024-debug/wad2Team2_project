@@ -356,19 +356,20 @@ export default {
   min-height: 100vh;
   background-color: #f8f9fa;
   padding-bottom: 2rem;
-  padding-top: calc(var(--navbar-height, 90px) + 8px);
+  padding-top: 0;
 }
 
 /* Header part */
 .header {
   background: linear-gradient(135deg, #eeb264 0%, #da7644 80%);
   color:  white;
-  padding: 1rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
   position: sticky;
-  top: var(--navbar-height, 90px);
+  top: 0;
+  margin-top: calc(var(--navbar-height, 90px) * -1);
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -415,8 +416,9 @@ export default {
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: calc(var(--navbar-height, 90px) + 68px);
+  top: 72px;;
   z-index: 99;
+  margin-bottom: 5rem;
 }
 
 .category-filter::-webkit-scrollbar {

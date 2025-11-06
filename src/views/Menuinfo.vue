@@ -310,7 +310,7 @@ export default {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  padding-top: 20px;
+  padding-top: calc(var(--navbar-height, 90px) + 16px);
   /*padding between header and navbar */
 }
 

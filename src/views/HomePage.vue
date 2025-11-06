@@ -56,7 +56,7 @@
           <div class="hero-content">
             <div class="container">
               <h1 class="hero-title">
-                Hawker Centre Hub
+                HAWKER CENTRE HUB
               </h1>
               <p class="hero-subtitle">
                 One-stop platform to find queues, seats, stalls, and nearest locations
@@ -385,8 +385,8 @@ export default {
 }
 
 .hero-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 4.5rem;
+  font-family: 'Cooper Black', 'CooperBlack', 'Georgia', serif;
+  font-size: 4rem;
   font-weight: 800;
   color: white;
   text-shadow: 3px 3px 20px rgba(0, 0, 0, 0.6);

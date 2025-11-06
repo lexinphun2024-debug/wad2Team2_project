@@ -416,7 +416,7 @@ export default {
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: 72px;;
+  top: 72px;
   z-index: 99;
   margin-bottom: 5rem;
 }

@@ -376,7 +376,7 @@ export default {
 /* Hero Content - More padding from top */
 .hero-content {
   position: absolute;
-  top: 45%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;

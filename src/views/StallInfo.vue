@@ -356,6 +356,7 @@ export default {
   min-height: 100vh;
   background-color: #f8f9fa;
   padding-bottom: 2rem;
+  padding-top: calc(var(--navbar-height, 90px) + 16px);
 }
 
 /* Header part */
@@ -367,7 +368,7 @@ export default {
   align-items: center;
   gap: 1rem;
   position: sticky;
-  top: 0;
+  top: var(--navbar-height, 90px);
   z-index: 100;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -414,7 +415,7 @@ export default {
   background: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: 72px;
+  top: calc(var(--navbar-height, 90px) + 68px);
   z-index: 99;
 }
 

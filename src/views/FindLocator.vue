@@ -242,6 +242,7 @@ export default {
 .find-locator {
   min-height: 100vh;
   background-color: #f8f9fa;
+  padding-top: calc(var(--navbar-height, 90px) + 20px);
 }
 
 .map-container {

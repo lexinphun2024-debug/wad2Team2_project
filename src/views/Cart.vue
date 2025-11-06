@@ -645,6 +645,7 @@ export default {
 .cart-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
+  padding-top: calc(var(--navbar-height, 90px) + 20px);
 }
 
 .cart-content {

@@ -328,7 +328,7 @@ export default {
   margin-bottom: 3rem;
   overflow:visible;
   /*allow dropdown to overflow*/
-  padding-top: 16px;
+  padding-top: calc(var(--navbar-height, 90px) + 16px);
 }
 
 .carousel {

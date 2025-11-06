@@ -154,10 +154,11 @@ export default {
 </script>
 
 <style scoped>
-.stall-actions-page {
+.stallaction {
   min-height: 100vh;
   background: linear-gradient(180deg, rgba(248, 249, 250, 0.4) 0%, #ffffff 60%);
   padding-bottom: 80px;
+  padding-top: calc(var(--navbar-height, 90px) + 20px);
 }
 
 .container {

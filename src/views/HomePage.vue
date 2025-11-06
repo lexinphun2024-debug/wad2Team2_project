@@ -325,10 +325,9 @@ export default {
 .hero-section {
   position: relative;
   min-height: 85vh;
-  margin-bottom: 3rem;
   overflow:visible;
   /*allow dropdown to overflow*/
-  padding-top: calc(var(--navbar-height, 90px) + 16px);
+  padding-top: var(--navbar-height, 90px);
 }
 
 .carousel {

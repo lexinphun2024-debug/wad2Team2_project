@@ -156,16 +156,15 @@
                   <div class="item-total">
                     <span class="total-label">Total</span>
                     <span class="total-amount">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                    <button 
+                      class="delete-btn" 
+                      @click="deleteItem(item)"
+                      :disabled="removingItems.has(item.id)"
+                      title="Remove item"
+                    >
+                      <span class="delete-icon">🗑️</span>
+                    </button>
                   </div>
-                  
-                  <button 
-                    class="delete-btn" 
-                    @click="deleteItem(item)"
-                    :disabled="removingItems.has(item.id)"
-                    title="Remove item"
-                  >
-                    <span class="delete-icon">🗑️</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -1334,9 +1333,10 @@ input[type="checkbox"]:checked + .checkbox-custom-item::after {
 
 .item-total {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  min-width: 90px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  min-width: 140px;
 }
 
 .total-label {
@@ -1353,8 +1353,8 @@ input[type="checkbox"]:checked + .checkbox-custom-item::after {
 }
 
 .delete-btn {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border: 2px solid #fee;
   background: #fff5f5;
   border-radius: 8px;
@@ -1647,6 +1647,12 @@ input[type="checkbox"]:checked + .checkbox-custom-item::after {
     width: 100%;
     flex-wrap: wrap;
     justify-content: space-between;
+  }
+
+  .item-total {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 0.75rem;
   }
 
   .action-buttons {

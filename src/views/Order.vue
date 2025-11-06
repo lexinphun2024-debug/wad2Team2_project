@@ -355,7 +355,7 @@ export default {
 .order-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
-  padding: 20px;
+  padding: calc(var(--navbar-height, 90px) + 20px) 20px 20px;
 }
 
 /* Loading part */

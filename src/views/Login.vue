@@ -40,9 +40,9 @@
         </div>
       </div>
 
-      <!-- Form -->
+      <!-- form part -->
       <div class="form-container">
-        <!-- Email -->
+       
         <div class="input-group">
           <label class="input-label">📧 Email</label>
           <input
@@ -59,7 +59,7 @@
           </transition>
         </div>
 
-        <!-- Username (Sign Up only) -->
+        <!-- sign up username -->
         <transition name="slide">
           <div v-if="!isLogin" class="input-group">
             <label class="input-label">👤 Username</label>
@@ -73,7 +73,7 @@
           </div>
         </transition>
 
-        <!-- Password -->
+        <!-- password  -->
         <div class="input-group">
           <label class="input-label">🔒 Password</label>
           <div class="password-wrapper">
@@ -104,7 +104,7 @@
           </div>
         </div>
 
-        <!-- Confirm Password (Sign Up only) -->
+        <!-- confirm password -->
         <transition name="slide">
           <div v-if="!isLogin" class="input-group">
             <label class="input-label">🔐 Confirm Password</label>
@@ -124,12 +124,12 @@
           </div>
         </transition>
 
-        <!-- Forgot Password -->
+        <!-- forgot password -->
         <div v-if="isLogin" class="forgot-password">
           <a href="#" @click.prevent="handleForgotPassword">Forgot Password?</a>
         </div>
 
-        <!-- Submit Button -->
+        <!-- submit the sign up button -->
         <button 
           @click="handleSubmit" 
           class="submit-btn"
@@ -148,14 +148,28 @@
 
       </div>
 
-      <!-- Success Overlay -->
       <transition name="fade-scale">
         <div v-if="showSuccess" class="success-overlay">
           <div class="success-content">
             <div class="success-icon">✓</div>
             <h3>{{ successMessage }}</h3>
-            <p>Redirecting to homepage...</p>
+            <p>{{ successSubMessage }}</p>
             <div class="success-loader"></div>
+          </div>
+        </div>
+      </transition>
+
+      <!--Email Notification -->
+      <transition name="fade-scale">
+        <div v-if="showEmailVerification" class="email-verification-overlay">
+          <div class="verification-content">
+            <div class="verification-icon">📧</div>
+            <h3>Check Your Email!</h3>
+            <p class="verification-email">We sent a verification link to<br><strong>{{ email }}</strong></p>
+            <p class="verification-instruction">Click the link in the email to verify your account and log in automatically.</p>
+            <button @click="closeEmailVerification" class="btn-close-verification">
+              Got it!
+            </button>
           </div>
         </div>
       </transition>
@@ -169,7 +183,7 @@
       </div>
     </transition>
 
-    <!-- Terms -->
+    <!-- Terms & Condition -->
     <p class="terms">
       By continuing, you agree to our 
       <a href="#">Terms</a> & <a href="#">Privacy</a>
@@ -178,11 +192,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { supabase } from "@/services/supabaseService"
-import { useRouter } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
 
 const router = useRouter()
+const route = useRoute()
 
 // State
 const isLogin = ref(true)
@@ -195,8 +210,29 @@ const loading = ref(false)
 const emailError = ref(false)
 const showSuccess = ref(false)
 const successMessage = ref('')
+const successSubMessage = ref('')
+const showEmailVerification = ref(false)
 const alertMessage = ref('')
 const alertType = ref('error')
+
+// Check for email verification
+onMounted(async () => {
+  // Check if this is a redirect from email verification
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (session) {
+    // User is logged in from the email verification
+    const displayUsername = session.user.user_metadata?.username || session.user.email.split('@')[0]
+    
+    successMessage.value = `Email verified successfully! 🎉`
+    successSubMessage.value = `Welcome, ${displayUsername}!`
+    showSuccess.value = true
+
+    setTimeout(() => {
+      router.push('/')
+    }, 2000)
+  }
+})
 
 const showAlert = (message, type = 'error') => {
   alertMessage.value = message
@@ -267,6 +303,11 @@ const switchMode = (login) => {
   emailError.value = false
 }
 
+const closeEmailVerification = () => {
+  showEmailVerification.value = false
+  router.push('/')
+}
+
 const handleSubmit = async () => {
   if (isFormInvalid.value) return
 
@@ -274,18 +315,25 @@ const handleSubmit = async () => {
 
   try {
     if (isLogin.value) {
-      // LOGIN
+      //check for login
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.value,
         password: password.value,
       })
 
-      if (error) throw error
+      if (error) {
+        if (error.message.includes('Email not confirmed')) {
+          showAlert('Please verify your email before logging in. Check your inbox for the verification link.', 'warning')
+          return
+        }
+        throw error
+      }
 
-      // Get username from user metadata
+      //retrieve the username 
       const displayUsername = data.user.user_metadata?.username || data.user.email.split('@')[0]
 
       successMessage.value = `Welcome back, ${displayUsername}! 🎉`
+      successSubMessage.value = 'Redirecting to homepage...'
       showSuccess.value = true
 
       setTimeout(() => {
@@ -294,24 +342,24 @@ const handleSubmit = async () => {
 
     } else {
       // SIGN UP
+      // Get the current URL origin for the redirect
+      const redirectUrl = window.location.origin + '/login'
+
       const { data, error } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
         options: {
           data: {
             username: username.value,
-          }
+          },
+          emailRedirectTo: redirectUrl
         }
       })
 
       if (error) throw error
 
-      successMessage.value = `Welcome, ${username.value}! 🎊`
-      showSuccess.value = true
-
-      setTimeout(() => {
-        router.push('/')
-      }, 1500)
+      // Show email verification message
+      showEmailVerification.value = true
     }
   } catch (error) {
     showAlert(error.message, 'error')
@@ -327,7 +375,9 @@ const handleForgotPassword = async () => {
   }
 
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email.value)
+    const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
+      redirectTo: window.location.origin + '/login'
+    })
     if (error) throw error
     showAlert('Password reset email sent! Check your inbox.', 'success')
   } catch (error) {
@@ -709,7 +759,7 @@ const handleForgotPassword = async () => {
   to { transform: rotate(360deg); }
 }
 
-.success-overlay {
+.success-overlay, .email-verification-overlay {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, 0.98);
@@ -720,12 +770,12 @@ const handleForgotPassword = async () => {
   z-index: 100;
 }
 
-.success-content {
+.success-content, .verification-content {
   text-align: center;
   padding: 40px;
 }
 
-.success-icon {
+.success-icon, .verification-icon {
   width: 80px;
   height: 80px;
   background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
@@ -751,7 +801,7 @@ const handleForgotPassword = async () => {
   }
 }
 
-.success-content h3 {
+.success-content h3, .verification-content h3 {
   color: #ff6b35;
   font-size: 24px;
   margin-bottom: 8px;
@@ -761,6 +811,42 @@ const handleForgotPassword = async () => {
   color: #666;
   font-size: 14px;
   margin-bottom: 20px;
+}
+
+.verification-email {
+  color: #666;
+  font-size: 15px;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.verification-email strong {
+  color: #ff6b35;
+}
+
+.verification-instruction {
+  color: #999;
+  font-size: 13px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.btn-close-verification {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.btn-close-verification:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
 }
 
 .success-loader {
